@@ -28,11 +28,7 @@ public class TaskManager {
     }
 
     public Task searchTaskByID(int taskID) {
-        if (tasks.containsKey(taskID)) {
             return tasks.get(taskID);
-        } else {
-            return null;
-        }
     }
 
     public void deleteAllTask() {
@@ -76,11 +72,7 @@ public class TaskManager {
     }
 
     public Epic searchEpicByID(int epicID) {
-        if (epics.containsKey(epicID)) {
             return epics.get(epicID);
-        } else {
-            return null;
-        }
     }
 
     public ArrayList<Integer> epicList() {
@@ -120,9 +112,7 @@ public class TaskManager {
         subTask.setTaskID(IDGenerator.generateNewID());
         subTasks.put(subTask.getTaskID(), subTask);
         Epic epic = searchEpicByID(subTask.getEpicID());
-        ArrayList<Integer> listID = epic.getSubTaskID();
-        listID.add(subTask.getTaskID());
-        epic.setSubTaskID(listID);
+        epic.addSubTask(subTask.getTaskID());
         updateEpic(epic);
         return subTask;
 
@@ -138,20 +128,14 @@ public class TaskManager {
     public void deleteSubTask(int subTaskID) {
         SubTask subTask = subTasks.get(subTaskID);
         Epic epic = searchEpicByID(subTask.getEpicID());
-        ArrayList<Integer> listID = epic.getSubTaskID();
-        listID.remove((Integer) subTaskID);
-        epic.setSubTaskID(listID);
+        epic.removeSubTask(subTaskID);
         subTasks.remove(subTaskID);
         updateEpic(epic);
     }
 
 
     public SubTask searchSubTaskByID(int subTaskID) {
-        if (subTasks.containsKey(subTaskID)) {
             return subTasks.get(subTaskID);
-        } else {
-            return null;
-        }
     }
 
     public void deleteAllSubTask() {
