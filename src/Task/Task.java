@@ -1,4 +1,4 @@
-import java.util.Objects;
+package Task;
 
 public class Task {
     private String name;
@@ -15,7 +15,7 @@ public class Task {
 
     @Override
     public String toString() {
-        return "Task{" +
+        return "Task.Task{" +
                 "name='" + name + '\'' +
                 ", description='" + description + '\'' +
                 ", taskID=" + taskID +

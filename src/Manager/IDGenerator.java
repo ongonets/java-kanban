@@ -1,3 +1,5 @@
+package Manager;
+
 public class IDGenerator {
     static int sequence = 0;
 
