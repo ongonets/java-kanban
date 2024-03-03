@@ -1,4 +1,4 @@
-package Manager;
+package Managers.TaskManager;
 
 import Task.*;
 
@@ -13,7 +13,7 @@ public interface TaskManager {
 
     void deleteTask(int taskID);
 
-    Task searchTaskByID(int taskID);
+    Task getTask(int taskID);
 
     void deleteAllTask();
 
@@ -27,7 +27,7 @@ public interface TaskManager {
 
     void deleteAllEpic();
 
-    Epic searchEpicByID(int epicID);
+    Epic getEpic(int epicID);
 
     ArrayList<Integer> epicList();
 
@@ -37,9 +37,13 @@ public interface TaskManager {
 
     void deleteSubTask(int subTaskID);
 
-    SubTask searchSubTaskByID(int subTaskID);
+    SubTask getSubTask(int subTaskID);
 
     void deleteAllSubTask();
 
     ArrayList<Integer> subTaskList();
+
+    ArrayList<Integer> subTaskListByEpic(int epicID);
+
+    ArrayList<Task> getHistory();
 }

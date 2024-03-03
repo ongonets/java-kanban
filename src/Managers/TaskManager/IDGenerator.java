@@ -1,4 +1,4 @@
-package Manager;
+package Managers.TaskManager;
 
 public class IDGenerator {
     static int sequence = 0;
