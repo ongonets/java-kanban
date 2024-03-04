@@ -1,6 +1,7 @@
 package Task;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class Epic extends Task {
 
@@ -10,16 +11,34 @@ public class Epic extends Task {
         super(name, description, status);
         subTaskID = new ArrayList<>();
     }
+    public Epic(String name, String description, TaskStatus status, int taskID) {
+        super(name, description, status, taskID);
+        subTaskID = new ArrayList<>();
+    }
 
     @Override
     public String toString() {
-        return "Task.Epic{" +
+        return "Epic{" +
                 "name='" + super.getName() + '\'' +
                 ", description='" + super.getDescription() + '\'' +
                 ", taskID=" + super.getTaskID() +
                 ", status=" + super.getStatus() +
                 ", subTaskID=" + subTaskID +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        if (this == object) return true;
+        if (object == null || getClass() != object.getClass()) return false;
+        if (!super.equals(object)) return false;
+        Epic epic = (Epic) object;
+        return Objects.equals(subTaskID, epic.subTaskID);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), subTaskID);
     }
 
     public ArrayList<Integer> getSubTaskID() {
