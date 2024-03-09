@@ -1,11 +1,13 @@
 package Managers.HistoryManager;
 
 import Task.*;
+import java.util.List;
 import java.util.ArrayList;
 
 public class InMemoryHistoryManager implements HistoryManager {
 
-    private ArrayList<Task> history;
+    private List<Task> history;
+    static final int HISTORY_VOLUME = 10;
 
 
     public InMemoryHistoryManager() {
@@ -13,13 +15,13 @@ public class InMemoryHistoryManager implements HistoryManager {
     }
 
     @Override
-    public ArrayList<Task> getHistory() {
-        return new ArrayList<>(history);
+    public List<Task> getHistory() {
+        return new ArrayList<Task>(history);
     }
 
     @Override
     public void add(Task task) {
-        if (!(history.size() < 10)) {
+        if (!(history.size() < HISTORY_VOLUME)) {
             history.remove(0);
         }
         history.add(task);

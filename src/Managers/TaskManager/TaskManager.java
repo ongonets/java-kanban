@@ -4,6 +4,7 @@ import Task.*;
 
 
 import java.util.ArrayList;
+import java.util.List;
 
 public interface TaskManager {
 
@@ -45,5 +46,5 @@ public interface TaskManager {
 
     ArrayList<Integer> subTaskListByEpic(int epicID);
 
-    ArrayList<Task> getHistory();
+    List<Task> getHistory();
 }
