@@ -1,12 +1,10 @@
-import Managers.HistoryManager.HistoryManager;
-import Managers.Managers;
-import Managers.TaskManager.TaskManager;
-import Task.*;
+import managers.historyManager.HistoryManager;
+import managers.Managers;
+import task.*;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class InMemoryHistoryManagerTest {

@@ -1,4 +1,4 @@
-package Task;
+package task;
 
 import java.util.ArrayList;
 import java.util.Objects;
@@ -11,6 +11,7 @@ public class Epic extends Task {
         super(name, description, status);
         subTaskID = new ArrayList<>();
     }
+
     public Epic(String name, String description, TaskStatus status, int taskID) {
         super(name, description, status, taskID);
         subTaskID = new ArrayList<>();
@@ -54,10 +55,11 @@ public class Epic extends Task {
         this.subTaskID.add(subTaskID);
     }
 
-    public void removeSubTask (int subTaskID) {
+    public void removeSubTask(int subTaskID) {
         this.subTaskID.remove((Integer) subTaskID);
     }
-    public void removeAllSubTask () {
+
+    public void removeAllSubTask() {
         this.subTaskID.clear();
     }
 }

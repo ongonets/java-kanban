@@ -1,10 +1,9 @@
-import Managers.Managers;
-import Managers.TaskManager.IDGenerator;
-import Managers.TaskManager.TaskManager;
-import Task.Epic;
-import Task.SubTask;
-import Task.Task;
-import Task.TaskStatus;
+import managers.Managers;
+import managers.taskManager.TaskManager;
+import task.Epic;
+import task.SubTask;
+import task.Task;
+import task.TaskStatus;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
