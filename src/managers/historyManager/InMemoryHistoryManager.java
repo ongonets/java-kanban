@@ -23,7 +23,7 @@ public class InMemoryHistoryManager implements HistoryManager {
         private int size = 0;
 
         public Node<T> linkLast(T task) {
-            if (size != 0) {
+            if (head != null) {
                 Node<T> oldTail = tail;
                 Node<T> newNode = new Node<>(oldTail, task, null);
                 tail = newNode;
