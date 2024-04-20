@@ -1,4 +1,4 @@
-package Task;
+package task;
 
 import java.util.Objects;
 
@@ -10,10 +10,12 @@ public class SubTask extends Task {
         super(name, description, status);
         this.epicID = epicID;
     }
+
     public SubTask(String name, String description, TaskStatus status, int epicID, int taskID) {
         super(name, description, status, taskID);
         this.epicID = epicID;
     }
+
     @Override
     public String toString() {
         return "SubTusk{" +
@@ -25,7 +27,7 @@ public class SubTask extends Task {
                 '}';
     }
 
-    @Override
+     @Override
     public boolean equals(Object object) {
         if (this == object) return true;
         if (object == null || getClass() != object.getClass()) return false;
