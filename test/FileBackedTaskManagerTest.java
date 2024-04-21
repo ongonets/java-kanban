@@ -1,5 +1,4 @@
 import managers.Managers;
-import managers.historyManager.HistoryManager;
 import managers.taskManager.FileBackedTaskManager;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -19,7 +18,7 @@ public class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTaskMan
     protected FileBackedTaskManager createTaskManager() {
         File tempFile;
         try {
-            tempFile = File.createTempFile("date", ".csv", new File("./testResources"));
+            tempFile = File.createTempFile("date", ".tmp");
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
