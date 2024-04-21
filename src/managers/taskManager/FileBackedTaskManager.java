@@ -21,6 +21,9 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     public void loadFromFile(File file) {
         try {
             List<String> lines = Files.readAllLines(file.toPath());
+            if (lines.isEmpty()) {
+                return;
+            }
             lines.remove(0);
             for (String line : lines) {
                 Task task = fromString(line);
@@ -37,7 +40,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                 }
             }
         } catch (IOException e) {
-            System.out.println("Ошибка чтения файла");
+            throw new ManagerReadException("Ошибка чтения файла.",e);
         }
     }
 
@@ -107,21 +110,21 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
             for (Integer i : subTasks.keySet()) {
                 output.write(toString(subTasks.get(i))+ "\n");
             }
-        } catch (Exception e) {
-            System.out.println("Ошибка записи файла");
+        } catch (IOException e) {
+            throw new ManagerSaveException("Ощибка записи файла.", e);
         }
 
     }
 
     @Override
-    public Task addNewTask(Task task) {
+    public Task addNewTask(Task task)  {
         Task newTask = super.addNewTask(task);
         save();
         return newTask;
     }
 
     @Override
-    public Task updateTask(Task task) {
+    public Task updateTask(Task task)  {
         Task newTask = super.updateTask(task);
         save();
         return newTask;

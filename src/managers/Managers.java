@@ -5,10 +5,11 @@ import managers.historyManager.InMemoryHistoryManager;
 import managers.taskManager.FileBackedTaskManager;
 import managers.taskManager.InMemoryTaskManager;
 
+import managers.taskManager.ManagerReadException;
 import managers.taskManager.TaskManager;
 
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.io.File;
+
 
 public class Managers {
 
@@ -20,7 +21,7 @@ public class Managers {
         return  new InMemoryHistoryManager();
     }
 
-    public static TaskManager getFileBacked() {
-        return new FileBackedTaskManager(getDefaultHistory(), Paths.get("resources/date.csv").toFile());
+    public static TaskManager getFileBacked(File file)  {
+        return new FileBackedTaskManager(getDefaultHistory(), file);
     }
 }
