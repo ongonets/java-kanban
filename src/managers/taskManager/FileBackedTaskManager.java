@@ -49,18 +49,18 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         String[] split = value.split(",");
         TaskType taskType = TaskType.valueOf(split[1]);
         TaskStatus taskStatus = TaskStatus.valueOf(split[3]);
-        int ID = Integer.parseInt(split[0]);
+        int taskID = Integer.parseInt(split[0]);
         Task task;
         switch (taskType) {
             case TaskType.TASK:
-                task = new Task(split[2], split[4], taskStatus, ID);
+                task = new Task(split[2], split[4], taskStatus, taskID);
                 break;
             case TaskType.EPIC:
-                task = new Epic(split[2], split[4], taskStatus, ID);
+                task = new Epic(split[2], split[4], taskStatus, taskID);
                 break;
             default:
                 int epicID = Integer.parseInt(split[5]);
-                task = new SubTask(split[2], split[4], taskStatus, epicID, ID);
+                task = new SubTask(split[2], split[4], taskStatus, epicID, taskID);
                 break;
         }
         return task;
@@ -79,7 +79,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         } else if (task.getClass() == Epic.class) {
             resultLine = String.join(",",
                     Integer.toString(task.getTaskID()),
-                    TaskType.TASK.toString(),
+                    TaskType.EPIC.toString(),
                     task.getName(),
                     task.getStatus().toString(),
                     task.getDescription(),
@@ -88,7 +88,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
             SubTask subTask = (SubTask) task;
             resultLine = String.join(",",
                     Integer.toString(task.getTaskID()),
-                    TaskType.TASK.toString(),
+                    TaskType.SUBTASK.toString(),
                     task.getName(),
                     task.getStatus().toString(),
                     task.getDescription(),
@@ -105,15 +105,19 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                 output.write(toString(tasks.get(i)) + "\n");
             }
             for (Integer i : epics.keySet()) {
-                output.write(toString(epics.get(i))+ "\n");
+                output.write(toString(epics.get(i)) + "\n");
             }
             for (Integer i : subTasks.keySet()) {
-                output.write(toString(subTasks.get(i))+ "\n");
+                output.write(toString(subTasks.get(i)) + "\n");
             }
         } catch (IOException e) {
             throw new ManagerSaveException("Ощибка записи файла.", e);
         }
 
+    }
+
+    public File getFile() {
+        return file;
     }
 
     @Override
