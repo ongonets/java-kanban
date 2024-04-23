@@ -1,6 +1,9 @@
 package managers.taskManager;
 
+import managers.Managers;
 import managers.historyManager.HistoryManager;
+import managers.taskManager.taskManagerException.ManagerReadException;
+import managers.taskManager.taskManagerException.ManagerSaveException;
 import task.*;
 import java.io.File;
 import java.io.FileWriter;
@@ -15,38 +18,42 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     public FileBackedTaskManager(HistoryManager historyManager, File file) {
         super(historyManager);
         this.file = file;
-        loadFromFile(file);
+
 
     }
 
-    public void loadFromFile(File file) {
+    public static TaskManager loadFromFile(File file) {
+        TaskManager taskManager = Managers.getFileBacked(file);
         try {
             List<String> lines = Files.readAllLines(file.toPath());
             if (lines.isEmpty()) {
-                return;
-            }
-            lines.remove(0);
-            for (String line : lines) {
-                Task task = fromString(line);
-                if (task.getClass() == Task.class) {
-                    tasks.put(task.getTaskID(), task);
-                } else if (task.getClass() == Epic.class) {
-                    epics.put(task.getTaskID(), (Epic) task);
-                } else {
-                    SubTask subTask = (SubTask) task;
-                    subTasks.put(task.getTaskID(), subTask);
-                    Epic epic = epics.get(subTask.getEpicID());
-                    epic.addSubTask(task.getTaskID());
-                    updateEpic(epic);
+                return taskManager;
+            } else {
+                lines.remove(0);
+                for (String line : lines) {
+                    if (!line.isEmpty()) {
+                        Task task = fromString(line);
+                        if (task.getClass() == Task.class) {
+                            taskManager.updateTask(task);
+                        } else if (task.getClass() == Epic.class) {
+                            taskManager.updateEpic((Epic) task);
+                        } else {
+                            taskManager.updateSubTask((SubTask) task);
+
+                        }
+                    } else {
+                        break;
+                    }
                 }
             }
         } catch (IOException e) {
             throw new ManagerReadException("Ошибка чтения файла.",e);
         }
+        return taskManager;
     }
 
 
-    public Task fromString(String value) {
+    public static Task fromString(String value) {
         String[] split = value.split(",");
         TaskType taskType = TaskType.valueOf(split[1]);
         TaskStatus taskStatus = TaskStatus.valueOf(split[3]);

@@ -93,7 +93,7 @@ public class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTaskMan
             throw new RuntimeException(e);
         }
 
-        taskManager.loadFromFile(taskManager.getFile());
+        taskManager =  (FileBackedTaskManager) FileBackedTaskManager.loadFromFile(taskManager.getFile());
         List<UUID> actualTaskList = taskManager.taskList();
         Assertions.assertEquals(taskList,actualTaskList);
     }

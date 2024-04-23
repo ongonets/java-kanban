@@ -9,9 +9,9 @@ import java.util.List;
 import java.util.UUID;
 
 public class InMemoryTaskManager implements TaskManager {
-    HashMap<UUID, Task> tasks;
-    HashMap<UUID, Epic> epics;
-    HashMap<UUID, SubTask> subTasks;
+    protected HashMap<UUID, Task> tasks;
+    protected HashMap<UUID, Epic> epics;
+    protected HashMap<UUID, SubTask> subTasks;
     HistoryManager historyManager;
 
 
@@ -108,7 +108,7 @@ public class InMemoryTaskManager implements TaskManager {
         return new ArrayList<>(epics.keySet());
     }
 
-    private Task updateEpicStatus(UUID epicID) {
+    protected Task updateEpicStatus(UUID epicID) {
         Epic epic = epics.get(epicID);
         int subTaskNew = 0;
         int subTaskDone = 0;
