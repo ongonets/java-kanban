@@ -1,10 +1,12 @@
 package managers.taskManager;
 
+import java.util.UUID;
+
 public class IDGenerator {
 
-    private static int sequence = 0;
 
-    static int generateNewID() {
-        return sequence++;
+
+    static UUID generateNewID() {
+        return UUID.randomUUID();
     }
 }

@@ -2,17 +2,18 @@ package task;
 
 import java.util.ArrayList;
 import java.util.Objects;
+import java.util.UUID;
 
 public class Epic extends Task {
 
-    private ArrayList<Integer> subTaskID;
+    private ArrayList<UUID> subTaskID;
 
     public Epic(String name, String description, TaskStatus status) {
         super(name, description, status);
         subTaskID = new ArrayList<>();
     }
 
-    public Epic(String name, String description, TaskStatus status, int taskID) {
+    public Epic(String name, String description, TaskStatus status, UUID taskID) {
         super(name, description, status, taskID);
         subTaskID = new ArrayList<>();
     }
@@ -42,21 +43,21 @@ public class Epic extends Task {
         return Objects.hash(super.hashCode(), subTaskID);
     }
 
-    public ArrayList<Integer> getSubTaskID() {
+    public ArrayList<UUID> getSubTaskID() {
         return new ArrayList<>(subTaskID);
     }
 
-    public void setSubTaskID(ArrayList<Integer> subTaskID) {
+    public void setSubTaskID(ArrayList<UUID> subTaskID) {
 
         this.subTaskID = new ArrayList<>(subTaskID);
     }
 
-    public void addSubTask(int subTaskID) {
+    public void addSubTask(UUID subTaskID) {
         this.subTaskID.add(subTaskID);
     }
 
-    public void removeSubTask(int subTaskID) {
-        this.subTaskID.remove((Integer) subTaskID);
+    public void removeSubTask(UUID subTaskID) {
+        this.subTaskID.remove(subTaskID);
     }
 
     public void removeAllSubTask() {

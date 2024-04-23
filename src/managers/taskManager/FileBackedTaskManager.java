@@ -7,6 +7,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.List;
+import java.util.UUID;
 
 public class FileBackedTaskManager extends InMemoryTaskManager {
     File file;
@@ -49,7 +50,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         String[] split = value.split(",");
         TaskType taskType = TaskType.valueOf(split[1]);
         TaskStatus taskStatus = TaskStatus.valueOf(split[3]);
-        int taskID = Integer.parseInt(split[0]);
+        UUID taskID = UUID.fromString(split[0]);
         Task task;
         switch (taskType) {
             case TaskType.TASK:
@@ -59,7 +60,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                 task = new Epic(split[2], split[4], taskStatus, taskID);
                 break;
             default:
-                int epicID = Integer.parseInt(split[5]);
+                UUID epicID = UUID.fromString(split[5]);
                 task = new SubTask(split[2], split[4], taskStatus, epicID, taskID);
                 break;
         }
@@ -70,7 +71,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         String resultLine;
         if (task.getClass() == Task.class) {
             resultLine = String.join(",",
-                    Integer.toString(task.getTaskID()),
+                    task.getTaskID().toString(),
                     TaskType.TASK.toString(),
                     task.getName(),
                     task.getStatus().toString(),
@@ -78,7 +79,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                     "");
         } else if (task.getClass() == Epic.class) {
             resultLine = String.join(",",
-                    Integer.toString(task.getTaskID()),
+                    task.getTaskID().toString(),
                     TaskType.EPIC.toString(),
                     task.getName(),
                     task.getStatus().toString(),
@@ -87,12 +88,12 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         } else {
             SubTask subTask = (SubTask) task;
             resultLine = String.join(",",
-                    Integer.toString(task.getTaskID()),
+                    task.getTaskID().toString(),
                     TaskType.SUBTASK.toString(),
                     task.getName(),
                     task.getStatus().toString(),
                     task.getDescription(),
-                    Integer.toString(subTask.getEpicID())
+                    subTask.getEpicID().toString()
             );
         }
         return resultLine;
@@ -101,13 +102,13 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     public void save() {
         try (FileWriter output = new FileWriter(file)) {
             output.write("id,type,name,status,description,epic\n");
-            for (Integer i : tasks.keySet()) {
+            for (UUID i : tasks.keySet()) {
                 output.write(toString(tasks.get(i)) + "\n");
             }
-            for (Integer i : epics.keySet()) {
+            for (UUID i : epics.keySet()) {
                 output.write(toString(epics.get(i)) + "\n");
             }
-            for (Integer i : subTasks.keySet()) {
+            for (UUID i : subTasks.keySet()) {
                 output.write(toString(subTasks.get(i)) + "\n");
             }
         } catch (IOException e) {
@@ -135,7 +136,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     }
 
     @Override
-    public void deleteTask(int taskID) {
+    public void deleteTask(UUID taskID) {
         super.deleteTask(taskID);
         save();
     }
@@ -161,7 +162,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     }
 
     @Override
-    public void deleteEpic(int epicID) {
+    public void deleteEpic(UUID epicID) {
         super.deleteEpic(epicID);
         save();
     }
@@ -187,7 +188,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     }
 
     @Override
-    public void deleteSubTask(int subTaskID) {
+    public void deleteSubTask(UUID subTaskID) {
         super.deleteSubTask(subTaskID);
         save();
     }

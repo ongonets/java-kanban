@@ -2,15 +2,12 @@ package managers.historyManager;
 
 import task.*;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.ArrayList;
-import java.util.Map;
+import java.util.*;
 
 public class InMemoryHistoryManager implements HistoryManager {
 
     LinkedList<Task> history;
-    Map<Integer, Node<Task>> historyByID;
+    Map<UUID, Node<Task>> historyByID;
 
     public InMemoryHistoryManager() {
         history = new LinkedList<>();
@@ -93,7 +90,7 @@ public class InMemoryHistoryManager implements HistoryManager {
     }
 
     @Override
-    public void remove(int taskID) {
+    public void remove(UUID taskID) {
         if (historyByID.containsKey(taskID)) {
             Node<Task> removeNode = historyByID.get(taskID);
             history.removeNode(removeNode);

@@ -12,6 +12,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.List;
+import java.util.UUID;
 
 public class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTaskManager>{
     @Override
@@ -27,7 +28,7 @@ public class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTaskMan
 
     @Test
     void save_shouldWriteTaskInFile() {
-        Task task = new Task("Задача 1", "Описание 1", TaskStatus.NEW, 0);
+        Task task = new Task("Задача 1", "Описание 1", TaskStatus.NEW);
         taskManager.addNewTask(task);
         Task actual;
         try{
@@ -58,7 +59,7 @@ public class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTaskMan
     void save_shouldWriteSubTaskInFile() {
         Epic epic = new Epic("Эпик 1","Описание 1", TaskStatus.NEW);
         taskManager.addNewEpic(epic);
-        int epicID = epic.getTaskID();
+        UUID epicID = epic.getTaskID();
         SubTask subTask = new SubTask("Подзадача 1","Описание 1", TaskStatus.NEW,epicID);
         taskManager.addNewSubTask(subTask);
         Task actual;
@@ -77,7 +78,7 @@ public class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTaskMan
         taskManager.addNewTask(new Task("Задача 1", "Описание 1", TaskStatus.NEW));
         taskManager.addNewTask(new Task("Задача 2", "Описание 2", TaskStatus.NEW));
         taskManager.addNewTask(new Task("Задача 3", "Описание 3", TaskStatus.NEW));
-        List<Integer> taskList = taskManager.taskList();
+        List<UUID> taskList = taskManager.taskList();
         String lines;
         try {
             lines = Files.readString(taskManager.getFile().toPath());
@@ -93,7 +94,7 @@ public class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTaskMan
         }
 
         taskManager.loadFromFile(taskManager.getFile());
-        List<Integer> actualTaskList = taskManager.taskList();
+        List<UUID> actualTaskList = taskManager.taskList();
         Assertions.assertEquals(taskList,actualTaskList);
     }
 }

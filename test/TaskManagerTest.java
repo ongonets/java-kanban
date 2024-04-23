@@ -9,6 +9,7 @@ import task.Task;
 import task.TaskStatus;
 
 import java.util.List;
+import java.util.UUID;
 
 abstract class TaskManagerTest<T extends TaskManager> {
     protected T taskManager;
@@ -25,7 +26,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
         Task expected = new Task("Задача 1","Описание 1", TaskStatus.NEW);
         Task task = new Task("Задача 1","Описание 1", TaskStatus.NEW);
         taskManager.addNewTask(task);
-        int taskID = task.getTaskID();
+        UUID taskID = task.getTaskID();
         expected.setTaskID(taskID);
         Task actual = taskManager.getTask(taskID);
         Assertions.assertEquals(expected,actual);
@@ -35,7 +36,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
         Epic expected = new Epic("Эпик 1","Описание 1", TaskStatus.NEW);
         Epic epic = new Epic("Эпик 1","Описание 1", TaskStatus.NEW);
         taskManager.addNewEpic(epic);
-        int taskID = epic.getTaskID();
+        UUID taskID = epic.getTaskID();
         expected.setTaskID(taskID);
         Epic actual = taskManager.getEpic(taskID);
         Assertions.assertEquals(expected,actual);
@@ -43,14 +44,13 @@ abstract class TaskManagerTest<T extends TaskManager> {
 
     @Test
     void addNewSubTask_shouldReturnSubTask(){
-        SubTask expected = new SubTask("Подзадача 1","Описание 1", TaskStatus.NEW,0);
         Epic epic = new Epic("Эпик 1","Описание 1", TaskStatus.NEW);
         taskManager.addNewEpic(epic);
-        int epicID = epic.getTaskID();
+        UUID epicID = epic.getTaskID();
         SubTask subTask = new SubTask("Подзадача 1","Описание 1", TaskStatus.NEW,epicID);
         taskManager.addNewSubTask(subTask);
-        int taskID = subTask.getTaskID();
-        expected.setEpicID(epicID);
+        UUID taskID = subTask.getTaskID();
+        SubTask expected = new SubTask("Подзадача 1","Описание 1", TaskStatus.NEW,epicID);
         expected.setTaskID(taskID);
         SubTask actual = taskManager.getSubTask(taskID);
         Assertions.assertEquals(expected, actual);
@@ -61,7 +61,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
         Task expected = new Task("Задача 1","Описание 1", TaskStatus.NEW);
         Task task = new Task("Задача 1","Описание 1", TaskStatus.NEW);
         taskManager.addNewTask(task);
-        int taskID = task.getTaskID();
+        UUID taskID = task.getTaskID();
         expected.setTaskID(taskID);
         Task actual = taskManager.getTask(taskID);
         Assertions.assertEquals(expected,actual);
@@ -71,7 +71,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
         Epic expected = new Epic("Эпик 1","Описание 1", TaskStatus.NEW);
         Epic epic = new Epic("Эпик 1","Описание 1", TaskStatus.NEW);
         taskManager.addNewEpic(epic);
-        int taskID = epic.getTaskID();
+        UUID taskID = epic.getTaskID();
         expected.setTaskID(taskID);
         Epic actual = taskManager.getEpic(taskID);
         Assertions.assertEquals(expected,actual);
@@ -81,11 +81,11 @@ abstract class TaskManagerTest<T extends TaskManager> {
     void addNewSubTask_shouldGenerateNewID(){
         Epic epic = new Epic("Эпик 1","Описание 1", TaskStatus.NEW);
         taskManager.addNewEpic(epic);
-        int epicID = epic.getTaskID();
-        SubTask expected = new SubTask("Подзадача 1","Описание 1", TaskStatus.NEW,epicID,1);
+        UUID epicID = epic.getTaskID();
+        SubTask expected = new SubTask("Подзадача 1","Описание 1", TaskStatus.NEW,epicID);
         SubTask subTask = new SubTask("Подзадача 1","Описание 1", TaskStatus.NEW,epicID);
         taskManager.addNewSubTask(subTask);
-        int taskID = subTask.getTaskID();
+        UUID taskID = subTask.getTaskID();
         expected.setTaskID(taskID);
         SubTask actual = taskManager.getSubTask(taskID);
         Assertions.assertEquals(expected, actual);
@@ -97,11 +97,11 @@ abstract class TaskManagerTest<T extends TaskManager> {
     void epicShouldUpdateStatus() {
         Epic epic = new Epic("Эпик 1","Описание 1", TaskStatus.IN_PROGRESS);
         taskManager.addNewEpic(epic);
-        int epicID = epic.getTaskID();
+        UUID epicID = epic.getTaskID();
         Assertions.assertEquals(TaskStatus.IN_PROGRESS, taskManager.getEpic(epicID).getStatus());
         SubTask subTask = new SubTask("Подзадача 1","Описание 1", TaskStatus.NEW,epicID);
         taskManager.addNewSubTask(subTask);
-        int taskID = subTask.getTaskID();
+        UUID taskID = subTask.getTaskID();
         Assertions.assertEquals(TaskStatus.NEW, taskManager.getEpic(epicID).getStatus());
         subTask = new SubTask("Подзадача 1","Описание 1", TaskStatus.DONE,epicID, taskID);
         taskManager.updateSubTask(subTask);
@@ -113,7 +113,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
         Task task = new Task("Задача 1","Описание 1", TaskStatus.NEW);
         taskManager.addNewTask(task);
         taskManager.deleteTask(task.getTaskID());
-        List<Integer> taskList = taskManager.taskList();
+        List<UUID> taskList = taskManager.taskList();
         Assertions.assertTrue(taskList.isEmpty());
     }
 
@@ -122,7 +122,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
         Epic epic = new Epic("Эпик 1","Описание 1", TaskStatus.IN_PROGRESS);
         taskManager.addNewEpic(epic);
         taskManager.deleteEpic(epic.getTaskID());
-        List<Integer> epicList = taskManager.epicList();
+        List<UUID> epicList = taskManager.epicList();
         Assertions.assertTrue(epicList.isEmpty());
     }
 
@@ -130,11 +130,11 @@ abstract class TaskManagerTest<T extends TaskManager> {
     void deleteSubTask_shouldRemoveSubTask() {
         Epic epic = new Epic("Эпик 1","Описание 1", TaskStatus.NEW);
         taskManager.addNewEpic(epic);
-        int epicID = epic.getTaskID();
+        UUID epicID = epic.getTaskID();
         SubTask subTask = new SubTask("Подзадача 1","Описание 1", TaskStatus.NEW,epicID);
         taskManager.addNewSubTask(subTask);
         taskManager.deleteSubTask(subTask.getTaskID());;
-        List<Integer> subTaskList = taskManager.subTaskList();
+        List<UUID> subTaskList = taskManager.subTaskList();
         Assertions.assertTrue(subTaskList.isEmpty());
     }
 
@@ -142,11 +142,11 @@ abstract class TaskManagerTest<T extends TaskManager> {
     void deleteEpic_shouldRemoveEpicsSubTask() {
         Epic epic = new Epic("Эпик 1","Описание 1", TaskStatus.NEW);
         taskManager.addNewEpic(epic);
-        int epicID = epic.getTaskID();
+        UUID epicID = epic.getTaskID();
         SubTask subTask = new SubTask("Подзадача 1","Описание 1", TaskStatus.NEW,epicID);
         taskManager.addNewSubTask(subTask);
         taskManager.deleteEpic(epic.getTaskID());;
-        List<Integer> subTaskList = taskManager.subTaskList();
+        List<UUID> subTaskList = taskManager.subTaskList();
         Assertions.assertTrue(subTaskList.isEmpty());
     }
 
@@ -154,11 +154,11 @@ abstract class TaskManagerTest<T extends TaskManager> {
     void deleteSubTask_shouldUpdateSubTaskListInEpic() {
         Epic epic = new Epic("Эпик 1","Описание 1", TaskStatus.NEW);
         taskManager.addNewEpic(epic);
-        int epicID = epic.getTaskID();
+        UUID epicID = epic.getTaskID();
         SubTask subTask = new SubTask("Подзадача 1","Описание 1", TaskStatus.NEW,epicID);
         taskManager.addNewSubTask(subTask);
         taskManager.deleteSubTask(subTask.getTaskID());;
-        List<Integer> subTaskList = epic.getSubTaskID();
+        List<UUID> subTaskList = epic.getSubTaskID();
         Assertions.assertTrue(subTaskList.isEmpty());
     }
 }
