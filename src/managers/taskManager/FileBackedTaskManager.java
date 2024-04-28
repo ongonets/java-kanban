@@ -22,8 +22,8 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
 
     }
 
-    public static TaskManager loadFromFile(File file) {
-        TaskManager taskManager = Managers.getFileBacked(file);
+    public static FileBackedTaskManager loadFromFile(File file) {
+        FileBackedTaskManager taskManager = (FileBackedTaskManager) Managers.getFileBacked(file);
         try {
             List<String> lines = Files.readAllLines(file.toPath());
             if (lines.isEmpty()) {
@@ -33,14 +33,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                 for (String line : lines) {
                     if (!line.isEmpty()) {
                         Task task = fromString(line);
-                        if (task.getClass() == Task.class) {
-                            taskManager.updateTask(task);
-                        } else if (task.getClass() == Epic.class) {
-                            taskManager.updateEpic((Epic) task);
-                        } else {
-                            taskManager.updateSubTask((SubTask) task);
-
-                        }
+                        taskManager.addTaskToMap(task);
                     } else {
                         break;
                     }
@@ -52,6 +45,15 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         return taskManager;
     }
 
+    public void addTaskToMap(Task task) {
+        if (task.getClass() == Task.class) {
+            tasks.put(task.getTaskID(),task);
+        } else if (task.getClass() == Epic.class) {
+            epics.put(task.getTaskID(),(Epic) task);
+        } else {
+            subTasks.put(task.getTaskID(),(SubTask) task);
+        }
+    }
 
     public static Task fromString(String value) {
         String[] split = value.split(",");

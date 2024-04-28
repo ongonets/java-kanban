@@ -2,16 +2,12 @@ package managers.taskManager;
 
 import managers.historyManager.HistoryManager;
 import task.*;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 public class InMemoryTaskManager implements TaskManager {
-    protected HashMap<UUID, Task> tasks;
-    protected HashMap<UUID, Epic> epics;
-    protected HashMap<UUID, SubTask> subTasks;
+    protected Map<UUID, Task> tasks;
+    protected Map<UUID, Epic> epics;
+    protected Map<UUID, SubTask> subTasks;
     HistoryManager historyManager;
 
 
@@ -24,7 +20,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public Task addNewTask(Task task) {
-        task.setTaskID(IDGenerator.generateNewID());
+        task.setTaskID(IDGenerator.generateNewID(taskList()));
         tasks.put(task.getTaskID(), task);
         return task;
     }
@@ -60,7 +56,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public Epic addNewEpic(Epic epic) {
-        epic.setTaskID(IDGenerator.generateNewID());
+        epic.setTaskID(IDGenerator.generateNewID(epicList()));
         epics.put(epic.getTaskID(), epic);
         return epic;
     }
@@ -141,7 +137,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public SubTask addNewSubTask(SubTask subTask) {
-        subTask.setTaskID(IDGenerator.generateNewID());
+        subTask.setTaskID(IDGenerator.generateNewID(subTaskList()));
         subTasks.put(subTask.getTaskID(), subTask);
         Epic epic = epics.get(subTask.getEpicID());
         epic.addSubTask(subTask.getTaskID());
