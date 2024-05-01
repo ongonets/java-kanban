@@ -1,11 +1,12 @@
 package task;
 
 import java.util.Objects;
+import java.util.UUID;
 
 public class Task {
     private String name;
     private String description;
-    private int taskID;
+    private UUID taskID;
     private TaskStatus status;
 
     public Task(String name, String description, TaskStatus status) {
@@ -14,7 +15,7 @@ public class Task {
         this.status = status;
     }
 
-    public Task(String name, String description, TaskStatus status, int taskID) {
+    public Task(String name, String description, TaskStatus status, UUID taskID) {
         this.name = name;
         this.description = description;
         this.status = status;
@@ -37,7 +38,7 @@ public class Task {
         if (this == object) return true;
         if (object == null || getClass() != object.getClass()) return false;
         Task task = (Task) object;
-        return taskID == task.taskID && Objects.equals(name, task.name) && Objects.equals(description, task.description) && status == task.status;
+        return Objects.equals(taskID, task.taskID) && Objects.equals(name, task.name) && Objects.equals(description, task.description) && status == task.status;
     }
 
     @Override
@@ -61,11 +62,11 @@ public class Task {
         this.description = description;
     }
 
-    public int getTaskID() {
+    public UUID getTaskID() {
         return taskID;
     }
 
-    public void setTaskID(int taskID) {
+    public void setTaskID(UUID taskID) {
         this.taskID = taskID;
     }
 

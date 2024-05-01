@@ -1,17 +1,22 @@
 package task;
 
 import java.util.Objects;
+import java.util.UUID;
 
 public class SubTask extends Task {
 
-    private int epicID;
+    private UUID epicID;
 
-    public SubTask(String name, String description, TaskStatus status, int epicID) {
+    public SubTask(String name, String description, TaskStatus status) {
+        super(name, description, status);
+    }
+
+    public SubTask(String name, String description, TaskStatus status, UUID epicID) {
         super(name, description, status);
         this.epicID = epicID;
     }
 
-    public SubTask(String name, String description, TaskStatus status, int epicID, int taskID) {
+    public SubTask(String name, String description, TaskStatus status, UUID epicID, UUID taskID) {
         super(name, description, status, taskID);
         this.epicID = epicID;
     }
@@ -33,7 +38,7 @@ public class SubTask extends Task {
         if (object == null || getClass() != object.getClass()) return false;
         if (!super.equals(object)) return false;
         SubTask subTask = (SubTask) object;
-        return epicID == subTask.epicID;
+        return Objects.equals(epicID,(subTask.epicID));
     }
 
     @Override
@@ -41,11 +46,11 @@ public class SubTask extends Task {
         return Objects.hash(super.hashCode(), epicID);
     }
 
-    public int getEpicID() {
+    public UUID getEpicID() {
         return epicID;
     }
 
-    public void setEpicID(int epicID) {
+    public void setEpicID(UUID epicID) {
         this.epicID = epicID;
     }
 }

@@ -5,6 +5,7 @@ import task.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 public interface TaskManager {
 
@@ -12,39 +13,39 @@ public interface TaskManager {
 
     Task updateTask(Task task);
 
-    void deleteTask(int taskID);
+    void deleteTask(UUID taskID);
 
-    Task getTask(int taskID);
+    Task getTask(UUID taskID);
 
     void deleteAllTask();
 
-    ArrayList<Integer> taskList();
+    ArrayList<UUID> taskList();
 
     Epic addNewEpic(Epic epic);
 
     Epic updateEpic(Epic epic);
 
-    void deleteEpic(int epicID);
+    void deleteEpic(UUID epicID);
 
     void deleteAllEpic();
 
-    Epic getEpic(int epicID);
+    Epic getEpic(UUID epicID);
 
-    ArrayList<Integer> epicList();
+    ArrayList<UUID> epicList();
 
     SubTask addNewSubTask(SubTask subTask);
 
     SubTask updateSubTask(SubTask subTask);
 
-    void deleteSubTask(int subTaskID);
+    void deleteSubTask(UUID subTaskID);
 
-    SubTask getSubTask(int subTaskID);
+    SubTask getSubTask(UUID subTaskID);
 
     void deleteAllSubTask();
 
-    ArrayList<Integer> subTaskList();
+    ArrayList<UUID> subTaskList();
 
-    ArrayList<Integer> subTaskListByEpic(int epicID);
+    ArrayList<UUID> subTaskListByEpic(UUID epicID);
 
     List<Task> getHistory();
 }
