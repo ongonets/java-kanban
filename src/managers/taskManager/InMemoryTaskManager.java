@@ -2,7 +2,12 @@ package managers.taskManager;
 
 import managers.historyManager.HistoryManager;
 import task.*;
+
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.*;
+import java.util.function.Supplier;
+import java.util.stream.Stream;
 
 public class InMemoryTaskManager implements TaskManager {
     protected Map<UUID, Task> tasks;
@@ -106,17 +111,31 @@ public class InMemoryTaskManager implements TaskManager {
 
     protected Task updateEpicStatus(UUID epicID) {
         Epic epic = epics.get(epicID);
-        int subTaskNew = 0;
-        int subTaskDone = 0;
-        for (UUID subTaskID : epic.getSubTaskID()) {
-            SubTask subTask = subTasks.get(subTaskID);
-            if (TaskStatus.NEW.equals(subTask.getStatus())) {
-                subTaskNew++;
-            }
-            if (TaskStatus.DONE.equals(subTask.getStatus())) {
-                subTaskDone++;
-            }
+        Supplier<Stream<Task>> subTaskStream = () -> epic.getSubTaskID().stream()
+                .map(taskID -> subTasks.get(taskID));
+
+        Optional<LocalDateTime> endTime = subTaskStream.get()
+                .map(Task::getEndTime)
+                .filter(Objects::nonNull)
+                .max(LocalDateTime::compareTo);
+        Optional<LocalDateTime> startTime = subTaskStream.get()
+                .map(Task::getStartTime)
+                .filter(Objects::nonNull)
+                .min(LocalDateTime::compareTo);
+        if (startTime.isPresent() && endTime.isPresent()) {
+            epic.setEndTime(endTime.get());
+            epic.setStartTime(startTime.get());
+            epic.setDuration(Duration.between(epic.getStartTime(), epic.getEndTime()));
         }
+
+        long subTaskNew = subTaskStream.get()
+                .map(Task::getStatus)
+                .filter(taskStatus -> taskStatus.equals(TaskStatus.NEW))
+                .count();
+        long subTaskDone = subTaskStream.get()
+                .map(Task::getStatus)
+                .filter(taskStatus -> taskStatus.equals(TaskStatus.DONE))
+                .count();
         if (subTaskNew == epic.getSubTaskID().size()) {
             epic.setStatus(TaskStatus.NEW);
         } else if (subTaskDone == epic.getSubTaskID().size()) {
@@ -167,7 +186,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public SubTask getSubTask(UUID subTaskID) {
-        SubTask subTask =  subTasks.get(subTaskID);
+        SubTask subTask = subTasks.get(subTaskID);
         historyManager.add(subTask);
         return subTask;
     }
