@@ -40,7 +40,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
             return taskManager;
         } else {
             lines.removeFirst();
-            lines.stream().forEach(line -> taskManager.addTaskToMap(fromString(line)));
+            lines.forEach(line -> taskManager.addTaskToMap(fromString(line)));
         }
         taskManager.updateEpicId();
         return taskManager;
@@ -50,14 +50,18 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         if (task.getClass() == Task.class) {
             tasks.put(task.getTaskID(),task);
         } else if (task.getClass() == Epic.class) {
-            epics.put(task.getTaskID(),(Epic) task);
+            tasks.put(task.getTaskID(), task);
         } else {
-            subTasks.put(task.getTaskID(),(SubTask) task);
+            tasks.put(task.getTaskID(), task);
         }
     }
 
     public void updateEpicId() {
-        subTasks.values().forEach(subTask -> epics.get(subTask.getEpicID()).addSubTask(subTask.getTaskID()));
+        subTaskList().forEach(subTaskID -> {
+                    SubTask subTask = (SubTask) tasks.get(subTaskID);
+                    Epic task = (Epic) tasks.get(subTask.getEpicID());
+                    task.addSubTask(subTaskID);
+                });
         epicList().forEach(this::updateEpicStatus);
     }
 
@@ -129,11 +133,11 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
             for (UUID i : tasks.keySet()) {
                 output.write(toString(tasks.get(i)) + "\n");
             }
-            for (UUID i : epics.keySet()) {
-                output.write(toString(epics.get(i)) + "\n");
+            for (UUID i : tasks.keySet()) {
+                output.write(toString(tasks.get(i)) + "\n");
             }
-            for (UUID i : subTasks.keySet()) {
-                output.write(toString(subTasks.get(i)) + "\n");
+            for (UUID i : tasks.keySet()) {
+                output.write(toString(tasks.get(i)) + "\n");
             }
         } catch (IOException e) {
             throw new ManagerSaveException("Ощибка записи файла.", e);
