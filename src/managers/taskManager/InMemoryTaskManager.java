@@ -24,7 +24,7 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public Task addNewTask(Task task)  {
+    public Task addNewTask(Task task) {
         try {
             validateTime(task);
         } catch (RuntimeException e) {
@@ -213,7 +213,7 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public List<UUID> subTaskList() {
         return tasks.values().stream()
-                .filter(task -> task.getClass() == Task.class)
+                .filter(task -> task.getClass() == SubTask.class)
                 .map(Task::getTaskID)
                 .collect(Collectors.toList());
     }
@@ -228,6 +228,7 @@ public class InMemoryTaskManager implements TaskManager {
         return tasksWithPriority;
     }
 
+    @Override
     public void addToPriority(Task task) {
         if (task.getStartTime() != null) {
             tasksWithPriority.remove(task);
@@ -240,14 +241,17 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
 
+    @Override
     public void validateTime(Task validateTask) {
-        LocalDateTime startTime = validateTask.getStartTime();
-        LocalDateTime endTime = validateTask.getEndTime();
-        boolean validate = getPrioritizedTasks().stream()
-                .filter(task -> startTime.isAfter(task.getStartTime()) && startTime.isBefore(task.getEndTime()) ||
-                        endTime.isAfter(task.getStartTime()) && endTime.isBefore(task.getEndTime()))
-                .findFirst()
-                .isEmpty();
-        if(!validate) throw new RuntimeException();
+        if (validateTask.getStartTime() != null) {
+            LocalDateTime startTime = validateTask.getStartTime();
+            LocalDateTime endTime = validateTask.getEndTime();
+            boolean validate = getPrioritizedTasks().stream()
+                    .filter(task -> startTime.isAfter(task.getStartTime()) && startTime.isBefore(task.getEndTime()) ||
+                            endTime.isAfter(task.getStartTime()) && endTime.isBefore(task.getEndTime()))
+                    .findFirst()
+                    .isEmpty();
+            if (!validate) throw new RuntimeException();
+        }
     }
 }

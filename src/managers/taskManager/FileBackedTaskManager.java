@@ -43,6 +43,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
             lines.forEach(line -> taskManager.addTaskToMap(fromString(line)));
         }
         taskManager.updateEpicId();
+        taskManager.updatePriority();
         return taskManager;
     }
 
@@ -65,6 +66,10 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         epicList().forEach(this::updateEpicStatus);
     }
 
+    public void updatePriority() {
+        tasks.values().forEach(this::addToPriority);
+    }
+
     public static Task fromString(String value) {
         String[] split = value.split(",");
         TaskType taskType = TaskType.valueOf(split[1]);
@@ -72,10 +77,10 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         UUID taskID = UUID.fromString(split[0]);
         LocalDateTime startTime = null;
         Duration duration = null;
-        if (!split[5].isEmpty()) {
+        if (!split[5].isBlank()) {
             startTime = LocalDateTime.parse(split[5],DATE_TIME_FORMATTER);
         }
-        if (!split[6].isEmpty()) {
+        if (!split[6].isBlank()) {
             duration = Duration.ofMinutes(Integer.parseInt(split[6]));
         }
         Task task;
@@ -94,7 +99,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         return task;
     }
 
-    public String toString(Task task) {
+    public static String toString(Task task) {
         String resultLine = task.getTaskID().toString();
         if (task.getClass() == Task.class) {
             resultLine = String.join(",",resultLine,TaskType.TASK.toString());
@@ -105,13 +110,12 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         }
         String startTime = Optional.ofNullable(task.getStartTime())
                 .map(localDateTime -> localDateTime.format(DATE_TIME_FORMATTER))
-                .orElse("");
-
-
+                .orElse(" ");
         String duration = Optional.ofNullable(task.getDuration())
                 .map(taskDuration -> String.valueOf(taskDuration.toMinutes()))
-                .orElse("");
-        resultLine = String.join(",",resultLine,
+                .orElse(" ");
+        resultLine = String.join(",",
+                resultLine,
                 task.getName(),
                 task.getStatus().toString(),
                 task.getDescription(),
@@ -121,7 +125,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
             SubTask subTask = (SubTask) task;
             resultLine = String.join(",",resultLine, subTask.getEpicID().toString());
         } else {
-            resultLine = String.join(",",resultLine, "");
+            resultLine = String.join(",",resultLine, " ");
         }
 
         return resultLine;
@@ -130,12 +134,6 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     public void save() {
         try (FileWriter output = new FileWriter(file)) {
             output.write("id,type,name,status,description,startTime, duration, epic\n");
-            for (UUID i : tasks.keySet()) {
-                output.write(toString(tasks.get(i)) + "\n");
-            }
-            for (UUID i : tasks.keySet()) {
-                output.write(toString(tasks.get(i)) + "\n");
-            }
             for (UUID i : tasks.keySet()) {
                 output.write(toString(tasks.get(i)) + "\n");
             }

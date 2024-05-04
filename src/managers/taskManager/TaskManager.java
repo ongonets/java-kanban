@@ -47,4 +47,8 @@ public interface TaskManager {
     List<Task> getHistory();
 
     Set<Task> getPrioritizedTasks();
+
+    void addToPriority(Task task);
+
+    void validateTime(Task task);
 }
