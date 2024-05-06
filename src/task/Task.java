@@ -70,7 +70,7 @@ public class Task {
 
     @Override
     public int hashCode() {
-        return Objects.hash(taskID);
+        return Objects.hash(name, description, taskID, status, duration, startTime);
     }
 
     public String getName() {
@@ -123,7 +123,7 @@ public class Task {
 
     public LocalDateTime getEndTime() {
         LocalDateTime endTime = null;
-        if (startTime != null || duration != null) {
+        if (startTime != null && duration != null) {
             endTime = startTime.plus(duration);
         }
         return endTime;

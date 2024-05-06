@@ -32,6 +32,8 @@ public interface TaskManager {
 
     List<UUID> epicList();
 
+    Task getEpic(UUID taskID);
+
     Task addNewSubTask(SubTask subTask);
 
     Task updateSubTask(SubTask subTask);
@@ -43,6 +45,8 @@ public interface TaskManager {
     List<UUID> subTaskList();
 
     ArrayList<UUID> subTaskListByEpic(UUID epicID);
+
+    Task getSubTask(UUID taskID);
 
     List<Task> getHistory();
 

@@ -13,12 +13,16 @@ import java.util.stream.Stream;
 
 public class InMemoryTaskManager implements TaskManager {
     protected Map<UUID, Task> tasks;
+    protected Map<UUID, Task> epics;
+    protected Map<UUID, Task> subTasks;
     HistoryManager historyManager;
     Set<Task> tasksWithPriority;
 
 
     public InMemoryTaskManager(HistoryManager historyManager) {
         tasks = new HashMap<>();
+        epics = new HashMap<>();
+        subTasks = new HashMap<>();
         tasksWithPriority = new TreeSet<>(Comparator.comparing(Task::getStartTime));
         this.historyManager = historyManager;
     }
@@ -50,7 +54,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void deleteTask(UUID taskID) {
-        deleteInPriority(taskID);
+        deleteTaskInPriority(taskID);
         tasks.remove(taskID);
         historyManager.remove(taskID);
     }
@@ -64,28 +68,27 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void deleteAllTask() {
+        tasks.keySet().forEach(this::deleteTaskInPriority);
         tasks.clear();
-        tasksWithPriority.clear();
     }
 
     @Override
     public List<UUID> taskList() {
         return tasks.values().stream()
-                .filter(task -> task.getClass() == Task.class)
                 .map(Task::getTaskID)
                 .collect(Collectors.toList());
     }
 
     @Override
     public Epic addNewEpic(Epic epic) {
-        epic.setTaskID(IDGenerator.generateNewID(tasks.keySet()));
-        tasks.put(epic.getTaskID(), epic);
+        epic.setTaskID(IDGenerator.generateNewID(epics.keySet()));
+        epics.put(epic.getTaskID(), epic);
         return epic;
     }
 
     @Override
     public Epic updateEpic(Epic epic) {
-        tasks.put(epic.getTaskID(), epic);
+        epics.put(epic.getTaskID(), epic);
         updateEpicStatus(epic.getTaskID());
         return epic;
     }
@@ -93,7 +96,7 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void deleteEpic(UUID epicID) {
         clearSubTask(epicID);
-        tasks.remove(epicID);
+        epics.remove(epicID);
         historyManager.remove(epicID);
     }
 
@@ -105,25 +108,24 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     private void clearSubTask(UUID epicID) {
-        Epic epic = (Epic) tasks.get(epicID);
+        Epic epic = (Epic) epics.get(epicID);
         epic.getSubTaskID().stream()
-                .peek(subTaskID -> tasks.remove(subTaskID))
-                .peek(this::deleteInPriority)
+                .peek(subTaskID -> subTasks.remove(subTaskID))
+                .peek(this::deleteSubTaskInPriority)
                 .forEach(subTaskID -> historyManager.remove(subTaskID));
     }
 
     @Override
     public List<UUID> epicList() {
-        return tasks.values().stream()
-                .filter(task -> task.getClass() == Epic.class)
+        return epics.values().stream()
                 .map(Task::getTaskID)
                 .collect(Collectors.toList());
     }
 
     protected void updateEpicStatus(UUID epicID) {
-        Epic epic = (Epic) tasks.get(epicID);
+        Epic epic = (Epic) epics.get(epicID);
         Supplier<Stream<Task>> subTaskStream = () -> epic.getSubTaskID().stream()
-                .map(taskID -> tasks.get(taskID));
+                .map(taskID -> subTasks.get(taskID));
 
         Optional<LocalDateTime> endTime = subTaskStream.get()
                 .map(Task::getEndTime)
@@ -154,13 +156,20 @@ public class InMemoryTaskManager implements TaskManager {
         } else {
             epic.setStatus(TaskStatus.IN_PROGRESS);
         }
-        tasks.put(epic.getTaskID(), epic);
+        epics.put(epic.getTaskID(), epic);
     }
 
     @Override
     public ArrayList<UUID> subTaskListByEpic(UUID epicID) {
-        Epic epic = (Epic) tasks.get(epicID);
+        Epic epic = (Epic) epics.get(epicID);
         return epic.getSubTaskID();
+    }
+
+    @Override
+    public Task getEpic(UUID taskID) {
+        Task task = epics.get(taskID);
+        historyManager.add(task);
+        return task;
     }
 
     @Override
@@ -170,9 +179,9 @@ public class InMemoryTaskManager implements TaskManager {
         } catch (RuntimeException e) {
             throw new TaskValidateException("Время задачи пересекается по времени выполнения");
         }
-        subTask.setTaskID(IDGenerator.generateNewID(tasks.keySet()));
-        tasks.put(subTask.getTaskID(), subTask);
-        Epic epic = (Epic) tasks.get(subTask.getEpicID());
+        subTask.setTaskID(IDGenerator.generateNewID(subTasks.keySet()));
+        subTasks.put(subTask.getTaskID(), subTask);
+        Epic epic = (Epic) epics.get(subTask.getEpicID());
         epic.addSubTask(subTask.getTaskID());
         updateEpic(epic);
         addToPriority(subTask);
@@ -186,7 +195,7 @@ public class InMemoryTaskManager implements TaskManager {
         } catch (RuntimeException e) {
             throw new TaskValidateException("Время задачи пересекается по времени выполнения");
         }
-        tasks.put(subTask.getTaskID(), subTask);
+        subTasks.put(subTask.getTaskID(), subTask);
         updateEpicStatus(subTask.getEpicID());
         addToPriority(subTask);
         return subTask;
@@ -195,11 +204,11 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void deleteSubTask(UUID subTaskID) {
-        SubTask subTask = (SubTask) tasks.get(subTaskID);
-        Epic epic = (Epic) tasks.get(subTask.getEpicID());
+        SubTask subTask = (SubTask) subTasks.get(subTaskID);
+        Epic epic = (Epic) epics.get(subTask.getEpicID());
         epic.removeSubTask(subTaskID);
-        deleteInPriority(subTaskID);
-        tasks.remove(subTaskID);
+        deleteSubTaskInPriority(subTaskID);
+        subTasks.remove(subTaskID);
         historyManager.remove(subTaskID);
         updateEpic(epic);
     }
@@ -212,10 +221,16 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public List<UUID> subTaskList() {
-        return tasks.values().stream()
-                .filter(task -> task.getClass() == SubTask.class)
+        return subTasks.values().stream()
                 .map(Task::getTaskID)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public Task getSubTask(UUID taskID) {
+        Task task = subTasks.get(taskID);
+        historyManager.add(task);
+        return task;
     }
 
     @Override
@@ -236,12 +251,19 @@ public class InMemoryTaskManager implements TaskManager {
         }
     }
 
-    public void deleteInPriority(UUID taskID) {
-        tasksWithPriority.remove(tasks.get(taskID));
+    public void deleteTaskInPriority(UUID taskID) {
+        if (getPrioritizedTasks().stream().anyMatch(task -> task.getTaskID().equals(taskID))) {
+            tasksWithPriority.remove(tasks.get(taskID));
+        }
     }
 
+    public void deleteSubTaskInPriority(UUID taskID) {
+        if (getPrioritizedTasks().stream().anyMatch(task -> task.getTaskID().equals(taskID))) {
+            tasksWithPriority.remove(tasks.get(taskID));
+        }
+    }
 
-    @Override
+       @Override
     public void validateTime(Task validateTask) {
         if (validateTask.getStartTime() != null) {
             LocalDateTime startTime = validateTask.getStartTime();
