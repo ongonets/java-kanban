@@ -13,8 +13,8 @@ import java.util.stream.Stream;
 
 public class InMemoryTaskManager implements TaskManager {
     protected Map<UUID, Task> tasks;
-    protected Map<UUID, Task> epics;
-    protected Map<UUID, Task> subTasks;
+    protected Map<UUID, Epic> epics;
+    protected Map<UUID, SubTask> subTasks;
     HistoryManager historyManager;
     Set<Task> tasksWithPriority;
 
@@ -108,7 +108,7 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     private void clearSubTask(UUID epicID) {
-        Epic epic = (Epic) epics.get(epicID);
+        Epic epic = epics.get(epicID);
         epic.getSubTaskID().stream()
                 .peek(subTaskID -> subTasks.remove(subTaskID))
                 .peek(this::deleteSubTaskInPriority)
@@ -123,7 +123,7 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     protected void updateEpicStatus(UUID epicID) {
-        Epic epic = (Epic) epics.get(epicID);
+        Epic epic =  epics.get(epicID);
         Supplier<Stream<Task>> subTaskStream = () -> epic.getSubTaskID().stream()
                 .map(taskID -> subTasks.get(taskID));
 
@@ -161,7 +161,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public ArrayList<UUID> subTaskListByEpic(UUID epicID) {
-        Epic epic = (Epic) epics.get(epicID);
+        Epic epic = epics.get(epicID);
         return epic.getSubTaskID();
     }
 
@@ -181,7 +181,7 @@ public class InMemoryTaskManager implements TaskManager {
         }
         subTask.setTaskID(IDGenerator.generateNewID(subTasks.keySet()));
         subTasks.put(subTask.getTaskID(), subTask);
-        Epic epic = (Epic) epics.get(subTask.getEpicID());
+        Epic epic =  epics.get(subTask.getEpicID());
         epic.addSubTask(subTask.getTaskID());
         updateEpic(epic);
         addToPriority(subTask);
@@ -204,8 +204,8 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void deleteSubTask(UUID subTaskID) {
-        SubTask subTask = (SubTask) subTasks.get(subTaskID);
-        Epic epic = (Epic) epics.get(subTask.getEpicID());
+        SubTask subTask =  subTasks.get(subTaskID);
+        Epic epic =  epics.get(subTask.getEpicID());
         epic.removeSubTask(subTaskID);
         deleteSubTaskInPriority(subTaskID);
         subTasks.remove(subTaskID);
