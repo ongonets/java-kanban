@@ -5,6 +5,7 @@ import task.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 public interface TaskManager {
@@ -19,33 +20,39 @@ public interface TaskManager {
 
     void deleteAllTask();
 
-    ArrayList<UUID> taskList();
+    List<UUID> taskList();
 
-    Epic addNewEpic(Epic epic);
+    Task addNewEpic(Epic epic);
 
-    Epic updateEpic(Epic epic);
+    Task updateEpic(Epic epic);
 
     void deleteEpic(UUID epicID);
 
     void deleteAllEpic();
 
-    Epic getEpic(UUID epicID);
+    List<UUID> epicList();
 
-    ArrayList<UUID> epicList();
+    Task getEpic(UUID taskID);
 
-    SubTask addNewSubTask(SubTask subTask);
+    Task addNewSubTask(SubTask subTask);
 
-    SubTask updateSubTask(SubTask subTask);
+    Task updateSubTask(SubTask subTask);
 
     void deleteSubTask(UUID subTaskID);
 
-    SubTask getSubTask(UUID subTaskID);
-
     void deleteAllSubTask();
 
-    ArrayList<UUID> subTaskList();
+    List<UUID> subTaskList();
 
     ArrayList<UUID> subTaskListByEpic(UUID epicID);
 
+    Task getSubTask(UUID taskID);
+
     List<Task> getHistory();
+
+    Set<Task> getPrioritizedTasks();
+
+    void addToPriority(Task task);
+
+    void validateTime(Task task);
 }

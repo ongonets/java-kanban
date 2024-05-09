@@ -11,7 +11,11 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 public class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTaskManager>{
@@ -47,7 +51,8 @@ public class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTaskMan
         Task actual;
         try{
             List<String> lines = Files.readAllLines(taskManager.getFile().toPath());
-            actual =  taskManager.fromString(lines.get(1));
+            System.out.println(lines.get(1));
+            actual = FileBackedTaskManager.fromString(lines.get(1));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -65,7 +70,7 @@ public class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTaskMan
         Task actual;
         try{
             List<String> lines = Files.readAllLines(taskManager.getFile().toPath());
-            actual =  taskManager.fromString(lines.get(2));
+            actual =  FileBackedTaskManager.fromString(lines.get(2));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -75,10 +80,12 @@ public class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTaskMan
 
     @Test
     void loadFromFile_shouldrestoreTaskManager() {
-        taskManager.addNewTask(new Task("Задача 1", "Описание 1", TaskStatus.NEW));
+        taskManager.addNewTask(new Task("Задача 1","Описание 1", TaskStatus.NEW, Duration.ofHours(2),
+                LocalDateTime.of(2024,1,2,0,0)));
         taskManager.addNewTask(new Task("Задача 2", "Описание 2", TaskStatus.NEW));
         taskManager.addNewTask(new Task("Задача 3", "Описание 3", TaskStatus.NEW));
         List<UUID> taskList = taskManager.taskList();
+        Set<Task> taskWithPriority = new HashSet<>(taskManager.getPrioritizedTasks());
         String lines;
         try {
             lines = Files.readString(taskManager.getFile().toPath());
@@ -95,6 +102,8 @@ public class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTaskMan
 
         taskManager =  (FileBackedTaskManager) FileBackedTaskManager.loadFromFile(taskManager.getFile());
         List<UUID> actualTaskList = taskManager.taskList();
+        Set<Task> ActualTaskWithPriority = taskManager.getPrioritizedTasks();
         Assertions.assertEquals(taskList,actualTaskList);
+        Assertions.assertEquals(taskWithPriority,ActualTaskWithPriority);
     }
 }
