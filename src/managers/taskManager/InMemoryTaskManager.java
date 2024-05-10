@@ -28,15 +28,15 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public Task addNewTask(Task task) {
+    public Task addNewTask(Task task) throws TaskValidateException {
         try {
-            validateTime(task);
+            validateTime(task);task.setTaskID(IDGenerator.generateNewID(tasks.keySet()));
+            tasks.put(task.getTaskID(), task);
+            addToPriority(task);
         } catch (RuntimeException e) {
             throw new TaskValidateException("Время задачи пересекается по времени выполнения");
         }
-        task.setTaskID(IDGenerator.generateNewID(tasks.keySet()));
-        tasks.put(task.getTaskID(), task);
-        addToPriority(task);
+
         return task;
     }
 
@@ -60,10 +60,10 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public Task getTask(UUID taskID) {
-        Task task = tasks.get(taskID);
-        historyManager.add(task);
-        return task;
+    public Optional<Task> getTask(UUID taskID) {
+        Optional<Task> taskOpt = Optional.ofNullable(tasks.get(taskID));
+        taskOpt.ifPresent(task -> historyManager.add(task));
+        return taskOpt;
     }
 
     @Override
@@ -166,10 +166,10 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public Task getEpic(UUID taskID) {
-        Task task = epics.get(taskID);
-        historyManager.add(task);
-        return task;
+    public Optional<Task> getEpic(UUID taskID) {
+        Optional<Task> taskOpt = Optional.ofNullable(epics.get(taskID));
+        taskOpt.ifPresent(task -> historyManager.add(task));
+        return taskOpt;
     }
 
     @Override
@@ -227,10 +227,10 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public Task getSubTask(UUID taskID) {
-        Task task = subTasks.get(taskID);
-        historyManager.add(task);
-        return task;
+    public Optional<Task> getSubTask(UUID taskID) {
+        Optional<Task> taskOpt = Optional.ofNullable(subTasks.get(taskID));
+        taskOpt.ifPresent(task -> historyManager.add(task));
+        return taskOpt;
     }
 
     @Override

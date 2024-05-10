@@ -3,10 +3,7 @@ package managers.taskManager;
 import task.*;
 
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 public interface TaskManager {
 
@@ -16,7 +13,7 @@ public interface TaskManager {
 
     void deleteTask(UUID taskID);
 
-    Task getTask(UUID taskID);
+    Optional<Task> getTask(UUID taskID);
 
     void deleteAllTask();
 
@@ -32,7 +29,7 @@ public interface TaskManager {
 
     List<UUID> epicList();
 
-    Task getEpic(UUID taskID);
+    Optional<Task> getEpic(UUID taskID);
 
     Task addNewSubTask(SubTask subTask);
 
@@ -46,7 +43,7 @@ public interface TaskManager {
 
     ArrayList<UUID> subTaskListByEpic(UUID epicID);
 
-    Task getSubTask(UUID taskID);
+    Optional<Task> getSubTask(UUID taskID);
 
     List<Task> getHistory();
 
