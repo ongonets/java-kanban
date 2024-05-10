@@ -6,20 +6,22 @@ import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import managers.taskManager.TaskManager;
 import managers.taskManager.taskManagerException.TaskValidateException;
-import task.SubTask;
+import task.Epic;
 import task.Task;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-public class SubTaskHandler extends BaseHandler implements HttpHandler {
+public class EpicHandler extends BaseHandler implements HttpHandler {
+
     TaskManager taskManager;
 
-    public SubTaskHandler(TaskManager taskManager) {
+    public EpicHandler(TaskManager taskManager) {
         this.taskManager = taskManager;
     }
 
@@ -27,17 +29,20 @@ public class SubTaskHandler extends BaseHandler implements HttpHandler {
     public void handle(HttpExchange exchange) throws IOException {
         Endpoint endpoint = getEndpoint(exchange.getRequestURI().getPath(), exchange.getRequestMethod());
         switch (endpoint) {
-            case GET_SUBTASK_LIST:
+            case GET_EPIC_LIST:
                 handleGetTasksList(exchange);
                 break;
-            case GET_SUBTASK:
+            case GET_EPIC:
                 handleGetTask(exchange);
                 break;
-            case POST_SUBTASK:
+            case POST_EPIC:
                 handlePostTask(exchange);
                 break;
-            case DELETE_SUBTASK:
+            case DELETE_EPIC:
                 handleDeleteTask(exchange);
+                break;
+            case GET_EPICS_SUBTASKS_LIST:
+                handleGetSubTasksList(exchange);
                 break;
             default:
                 sendCode(exchange, 404);
@@ -47,24 +52,25 @@ public class SubTaskHandler extends BaseHandler implements HttpHandler {
     private Endpoint getEndpoint(String requestPath, String requestMethod) {
         String[] pathParts = requestPath.split("/");
 
-        if (pathParts.length == 2 && pathParts[1].equals("subtasks")) {
+        if (pathParts.length == 2 && pathParts[1].equals("epics")) {
             if (requestMethod.equals("GET")) {
-                return Endpoint.GET_SUBTASK_LIST;
-            } else return Endpoint.POST_SUBTASK;
-        } else if (pathParts.length == 3 && pathParts[1].equals("subtasks")) {
+                return Endpoint.GET_EPIC_LIST;
+            } else return Endpoint.POST_EPIC;
+        } else if (pathParts.length == 3 && pathParts[1].equals("epics")) {
             if (requestMethod.equals("GET")) {
-                return Endpoint.GET_SUBTASK;
-            } else return Endpoint.DELETE_SUBTASK;
+                return Endpoint.GET_EPIC;
+            } else return Endpoint.DELETE_EPIC;
+        } else if (pathParts.length == 4 && pathParts[1].equals("epics") && pathParts[3].equals("subtasks")) {
+            return Endpoint.GET_EPICS_SUBTASKS_LIST;
         }
         return Endpoint.UNKNOWN;
     }
 
 
-
     private void handleGetTasksList(HttpExchange httpExchange) throws IOException {
         Gson gson = new GsonBuilder()
                 .create();
-        String response = gson.toJson(taskManager.subTaskList());
+        String response = gson.toJson(taskManager.epicList());
         sendText(httpExchange, response, 200);
     }
 
@@ -74,7 +80,8 @@ public class SubTaskHandler extends BaseHandler implements HttpHandler {
             sendCode(httpExchange, 404);
             return;
         }
-        taskManager.deleteSubTask(taskIDOpt.get());
+        taskManager.deleteEpic(taskIDOpt.get());
+
         sendCode(httpExchange, 200);
     }
 
@@ -89,7 +96,7 @@ public class SubTaskHandler extends BaseHandler implements HttpHandler {
             return;
         }
         UUID taskID = taskIDOpt.get();
-        Optional<Task> taskOpt = taskManager.getSubTask(taskID);
+        Optional<Task> taskOpt = taskManager.getEpic(taskID);
         if (taskOpt.isPresent()) {
             Task task = taskOpt.get();
             String response = gson.toJson(task);
@@ -106,10 +113,10 @@ public class SubTaskHandler extends BaseHandler implements HttpHandler {
                 .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter())
                 .create();
         String body = new String(httpExchange.getRequestBody().readAllBytes(), StandardCharsets.UTF_8);
-        SubTask task = gson.fromJson(body,SubTask.class);
+        Epic task = gson.fromJson(body, Epic.class);
         if (task.getTaskID() == null) {
             try {
-                taskManager.addNewSubTask(task);
+                taskManager.addNewEpic(task);
             } catch (TaskValidateException e) {
                 sendCode(httpExchange, 406);
                 return;
@@ -117,7 +124,7 @@ public class SubTaskHandler extends BaseHandler implements HttpHandler {
             sendCode(httpExchange, 201);
         } else {
             try {
-                taskManager.updateSubTask(task);
+                taskManager.updateEpic(task);
             } catch (TaskValidateException e) {
                 sendCode(httpExchange, 406);
                 return;
@@ -128,4 +135,26 @@ public class SubTaskHandler extends BaseHandler implements HttpHandler {
 
     }
 
+
+
+    private void handleGetSubTasksList(HttpExchange httpExchange) throws IOException {
+        Gson gson = new GsonBuilder()
+                .registerTypeAdapter(Duration.class, new DurationAdapter())
+                .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter())
+                .create();
+        Optional<UUID> taskIDOpt = getTaskId(httpExchange);
+        if (taskIDOpt.isEmpty()) {
+            sendCode(httpExchange, 404);
+            return;
+        }
+        UUID taskID = taskIDOpt.get();
+        List<UUID> subTaskList = taskManager.subTaskListByEpic(taskID);
+
+        String response = gson.toJson(subTaskList);
+        sendText(httpExchange, response, 200);
+
+
+        sendCode(httpExchange, 404);
+    }
 }
+

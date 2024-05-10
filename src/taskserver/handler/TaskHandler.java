@@ -129,12 +129,5 @@ public class TaskHandler extends BaseHandler implements HttpHandler {
 
     }
 
-    private Optional<UUID> getTaskId(HttpExchange exchange) {
-        String[] pathParts = exchange.getRequestURI().getPath().split("/");
-        try {
-            return Optional.of(UUID.fromString(pathParts[2]));
-        } catch (NumberFormatException exception) {
-            return Optional.empty();
-        }
-    }
+
 }
