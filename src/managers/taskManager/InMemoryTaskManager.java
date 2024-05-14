@@ -41,7 +41,7 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public Task updateTask(Task task) {
+    public Task updateTask(Task task) throws TaskValidateException {
         try {
             validateTime(task);
         } catch (RuntimeException e) {
@@ -160,9 +160,13 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public ArrayList<UUID> subTaskListByEpic(UUID epicID) {
-        Epic epic = epics.get(epicID);
-        return epic.getSubTaskID();
+    public List<UUID> subTaskListByEpic(UUID epicID) {
+        List<UUID> subTaskList = new ArrayList<>();
+        Optional<Epic> epicOpt = Optional.ofNullable(epics.get(epicID));
+        if (epicOpt.isPresent()) {
+            subTaskList = epicOpt.get().getSubTaskID();
+        }
+        return subTaskList;
     }
 
     @Override
@@ -173,7 +177,7 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public SubTask addNewSubTask(SubTask subTask) {
+    public SubTask addNewSubTask(SubTask subTask) throws TaskValidateException {
         try {
             validateTime(subTask);
         } catch (RuntimeException e) {
@@ -189,7 +193,7 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public SubTask updateSubTask(SubTask subTask) {
+    public SubTask updateSubTask(SubTask subTask) throws TaskValidateException {
         try {
             validateTime(subTask);
         } catch (RuntimeException e) {

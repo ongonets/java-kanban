@@ -1,7 +1,5 @@
 package taskserver.handler;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import managers.taskManager.TaskManager;
@@ -10,17 +8,13 @@ import task.Task;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.time.Duration;
-import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
 
 public class TaskHandler extends BaseHandler implements HttpHandler {
 
-    TaskManager taskManager;
-
     public TaskHandler(TaskManager taskManager) {
-        this.taskManager = taskManager;
+        super(taskManager);
     }
 
     @Override
@@ -46,7 +40,6 @@ public class TaskHandler extends BaseHandler implements HttpHandler {
 
     private Endpoint getEndpoint(String requestPath, String requestMethod) {
         String[] pathParts = requestPath.split("/");
-
         if (pathParts.length == 2 && pathParts[1].equals("tasks")) {
             if (requestMethod.equals("GET")) {
                 return Endpoint.GET_TASK_LIST;
@@ -62,8 +55,6 @@ public class TaskHandler extends BaseHandler implements HttpHandler {
 
 
     private void handleGetTasksList(HttpExchange httpExchange) throws IOException {
-        Gson gson = new GsonBuilder()
-                .create();
         String response = gson.toJson(taskManager.taskList());
         sendText(httpExchange, response, 200);
     }
@@ -75,15 +66,10 @@ public class TaskHandler extends BaseHandler implements HttpHandler {
             return;
         }
         taskManager.deleteTask(taskIDOpt.get());
-
         sendCode(httpExchange, 200);
     }
 
     private void handleGetTask(HttpExchange httpExchange) throws IOException {
-        Gson gson = new GsonBuilder()
-                .registerTypeAdapter(Duration.class, new DurationAdapter())
-                .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter())
-                .create();
         Optional<UUID> taskIDOpt = getTaskId(httpExchange);
         if (taskIDOpt.isEmpty()) {
             sendCode(httpExchange, 404);
@@ -102,10 +88,6 @@ public class TaskHandler extends BaseHandler implements HttpHandler {
     }
 
     private void handlePostTask(HttpExchange httpExchange) throws IOException {
-        Gson gson = new GsonBuilder()
-                .registerTypeAdapter(Duration.class, new DurationAdapter())
-                .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter())
-                .create();
         String body = new String(httpExchange.getRequestBody().readAllBytes(), StandardCharsets.UTF_8);
         Task task = gson.fromJson(body,Task.class);
         if (task.getTaskID() == null) {

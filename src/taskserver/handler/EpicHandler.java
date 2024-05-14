@@ -1,7 +1,5 @@
 package taskserver.handler;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import managers.taskManager.TaskManager;
@@ -11,18 +9,14 @@ import task.Task;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.time.Duration;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 public class EpicHandler extends BaseHandler implements HttpHandler {
 
-    TaskManager taskManager;
-
     public EpicHandler(TaskManager taskManager) {
-        this.taskManager = taskManager;
+        super(taskManager);
     }
 
     @Override
@@ -68,8 +62,6 @@ public class EpicHandler extends BaseHandler implements HttpHandler {
 
 
     private void handleGetTasksList(HttpExchange httpExchange) throws IOException {
-        Gson gson = new GsonBuilder()
-                .create();
         String response = gson.toJson(taskManager.epicList());
         sendText(httpExchange, response, 200);
     }
@@ -86,10 +78,6 @@ public class EpicHandler extends BaseHandler implements HttpHandler {
     }
 
     private void handleGetTask(HttpExchange httpExchange) throws IOException {
-        Gson gson = new GsonBuilder()
-                .registerTypeAdapter(Duration.class, new DurationAdapter())
-                .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter())
-                .create();
         Optional<UUID> taskIDOpt = getTaskId(httpExchange);
         if (taskIDOpt.isEmpty()) {
             sendCode(httpExchange, 404);
@@ -108,10 +96,6 @@ public class EpicHandler extends BaseHandler implements HttpHandler {
     }
 
     private void handlePostTask(HttpExchange httpExchange) throws IOException {
-        Gson gson = new GsonBuilder()
-                .registerTypeAdapter(Duration.class, new DurationAdapter())
-                .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter())
-                .create();
         String body = new String(httpExchange.getRequestBody().readAllBytes(), StandardCharsets.UTF_8);
         Epic task = gson.fromJson(body, Epic.class);
         if (task.getTaskID() == null) {
@@ -138,10 +122,6 @@ public class EpicHandler extends BaseHandler implements HttpHandler {
 
 
     private void handleGetSubTasksList(HttpExchange httpExchange) throws IOException {
-        Gson gson = new GsonBuilder()
-                .registerTypeAdapter(Duration.class, new DurationAdapter())
-                .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter())
-                .create();
         Optional<UUID> taskIDOpt = getTaskId(httpExchange);
         if (taskIDOpt.isEmpty()) {
             sendCode(httpExchange, 404);

@@ -41,7 +41,7 @@ public interface TaskManager {
 
     List<UUID> subTaskList();
 
-    ArrayList<UUID> subTaskListByEpic(UUID epicID);
+    List<UUID> subTaskListByEpic(UUID epicID);
 
     Optional<Task> getSubTask(UUID taskID);
 

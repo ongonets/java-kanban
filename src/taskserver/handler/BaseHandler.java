@@ -1,6 +1,9 @@
 package taskserver.handler;
 
+import com.google.gson.Gson;
 import com.sun.net.httpserver.HttpExchange;
+import managers.taskManager.TaskManager;
+import taskserver.HttpTaskServer;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -8,6 +11,13 @@ import java.util.Optional;
 import java.util.UUID;
 
 public class BaseHandler  {
+    TaskManager taskManager;
+    Gson gson;
+
+    public BaseHandler(TaskManager taskManager) {
+        gson = HttpTaskServer.getGson();
+        this.taskManager = taskManager;
+    }
 
     protected void sendText(HttpExchange exchange, String text, int statusCode) throws IOException {
         byte[] resp = text.getBytes(StandardCharsets.UTF_8);
