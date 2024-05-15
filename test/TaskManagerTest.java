@@ -29,7 +29,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
         taskManager.addNewTask(task);
         UUID taskID = task.getTaskID();
         expected.setTaskID(taskID);
-        Task actual = taskManager.getTask(taskID);
+        Task actual = taskManager.getTask(taskID).get();
         Assertions.assertEquals(expected,actual);
     }
     @Test
@@ -39,7 +39,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
         taskManager.addNewEpic(epic);
         UUID taskID = epic.getTaskID();
         expected.setTaskID(taskID);
-        Task actual = taskManager.getEpic(taskID);
+        Task actual = taskManager.getEpic(taskID).get();
         Assertions.assertEquals(expected,actual);
     }
 
@@ -53,7 +53,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
         UUID taskID = subTask.getTaskID();
         SubTask expected = new SubTask("Подзадача 1","Описание 1", TaskStatus.NEW,epicID);
         expected.setTaskID(taskID);
-        SubTask actual = (SubTask) taskManager.getSubTask(taskID);
+        SubTask actual = (SubTask) taskManager.getSubTask(taskID).get();
         Assertions.assertEquals(expected, actual);
     }
 
@@ -64,7 +64,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
         taskManager.addNewTask(task);
         UUID taskID = task.getTaskID();
         expected.setTaskID(taskID);
-        Task actual = taskManager.getTask(taskID);
+        Task actual = taskManager.getTask(taskID).get();
         Assertions.assertEquals(expected,actual);
     }
     @Test
@@ -74,7 +74,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
         taskManager.addNewEpic(epic);
         UUID taskID = epic.getTaskID();
         expected.setTaskID(taskID);
-        Epic actual = (Epic) taskManager.getEpic(taskID);
+        Epic actual = (Epic) taskManager.getEpic(taskID).get();
         Assertions.assertEquals(expected,actual);
     }
 
@@ -88,7 +88,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
         taskManager.addNewSubTask(subTask);
         UUID taskID = subTask.getTaskID();
         expected.setTaskID(taskID);
-        SubTask actual = (SubTask) taskManager.getSubTask(taskID);
+        SubTask actual = (SubTask) taskManager.getSubTask(taskID).get();
         Assertions.assertEquals(expected, actual);
     }
 
@@ -102,17 +102,17 @@ abstract class TaskManagerTest<T extends TaskManager> {
         SubTask subTask1 = new SubTask("Подзадача 1","Описание 1", TaskStatus.NEW,epicID);
         SubTask subTask2 = new SubTask("Подзадача 2","Описание 2", TaskStatus.DONE,epicID);
         taskManager.addNewSubTask(subTask1);
-        Assertions.assertEquals(TaskStatus.NEW, taskManager.getEpic(epicID).getStatus());
+        Assertions.assertEquals(TaskStatus.NEW, taskManager.getEpic(epicID).get().getStatus());
         taskManager.addNewSubTask(subTask2);
-        Assertions.assertEquals(TaskStatus.IN_PROGRESS, taskManager.getEpic(epicID).getStatus());
+        Assertions.assertEquals(TaskStatus.IN_PROGRESS, taskManager.getEpic(epicID).get().getStatus());
         subTask1.setStatus(TaskStatus.DONE);
         taskManager.updateSubTask(subTask1);
-        Assertions.assertEquals(TaskStatus.DONE, taskManager.getEpic(epicID).getStatus());
+        Assertions.assertEquals(TaskStatus.DONE, taskManager.getEpic(epicID).get().getStatus());
         subTask1.setStatus(TaskStatus.IN_PROGRESS);
         subTask2.setStatus(TaskStatus.IN_PROGRESS);
         taskManager.updateSubTask(subTask1);
         taskManager.updateSubTask(subTask2);
-        Assertions.assertEquals(TaskStatus.IN_PROGRESS, taskManager.getEpic(epicID).getStatus());
+        Assertions.assertEquals(TaskStatus.IN_PROGRESS, taskManager.getEpic(epicID).get().getStatus());
     }
 
     @Test
@@ -126,14 +126,14 @@ abstract class TaskManagerTest<T extends TaskManager> {
                 LocalDateTime.of(2024,1,1,2,0),epicID);
         taskManager.addNewSubTask(subTask1);
         Assertions.assertEquals( LocalDateTime.of(2024,1,1,0,0),
-                taskManager.getEpic(epicID).getStartTime());
+                taskManager.getEpic(epicID).get().getStartTime());
         Assertions.assertEquals( LocalDateTime.of(2024,1,1,1,0),
-                taskManager.getEpic(epicID).getEndTime());
+                taskManager.getEpic(epicID).get().getEndTime());
         taskManager.addNewSubTask(subTask2);
         Assertions.assertEquals( LocalDateTime.of(2024,1,1,0,0),
-                taskManager.getEpic(epicID).getStartTime());
+                taskManager.getEpic(epicID).get().getStartTime());
         Assertions.assertEquals( LocalDateTime.of(2024,1,1,3,0),
-                taskManager.getEpic(epicID).getEndTime());
+                taskManager.getEpic(epicID).get().getEndTime());
     }
 
     @Test
