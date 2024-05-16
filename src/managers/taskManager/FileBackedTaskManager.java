@@ -5,6 +5,7 @@ import managers.historyManager.HistoryManager;
 import managers.taskManager.taskManagerException.ManagerReadException;
 import managers.taskManager.taskManagerException.ManagerSaveException;
 import task.*;
+
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -32,9 +33,9 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         FileBackedTaskManager taskManager = (FileBackedTaskManager) Managers.getFileBacked(file);
         List<String> lines;
         try {
-             lines = Files.readAllLines(file.toPath());
+            lines = Files.readAllLines(file.toPath());
         } catch (IOException e) {
-            throw new ManagerReadException("Ошибка чтения файла.",e);
+            throw new ManagerReadException("Ошибка чтения файла.", e);
         }
         if (lines.isEmpty()) {
             return taskManager;
@@ -48,7 +49,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
 
     public void addTaskToMap(Task task) {
         if (task.getClass() == Task.class) {
-            tasks.put(task.getTaskID(),task);
+            tasks.put(task.getTaskID(), task);
             addToPriority(task);
         } else if (task.getClass() == Epic.class) {
             epics.put(task.getTaskID(), (Epic) task);
@@ -60,10 +61,10 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
 
     public void updateEpicId() {
         subTaskList().forEach(subTaskID -> {
-                    SubTask subTask = (SubTask) subTasks.get(subTaskID);
-                    Epic task = (Epic) epics.get(subTask.getEpicID());
-                    task.addSubTask(subTaskID);
-                });
+            SubTask subTask =  subTasks.get(subTaskID);
+            Epic task =  epics.get(subTask.getEpicID());
+            task.addSubTask(subTaskID);
+        });
         epicList().forEach(this::updateEpicStatus);
     }
 
@@ -76,7 +77,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         LocalDateTime startTime = null;
         Duration duration = null;
         if (!split[5].isBlank()) {
-            startTime = LocalDateTime.parse(split[5],DATE_TIME_FORMATTER);
+            startTime = LocalDateTime.parse(split[5], DATE_TIME_FORMATTER);
         }
         if (!split[6].isBlank()) {
             duration = Duration.ofMinutes(Integer.parseInt(split[6]));
@@ -84,10 +85,10 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         Task task;
         switch (taskType) {
             case TaskType.TASK:
-                task = new Task(split[2], split[4], taskStatus,duration,startTime, taskID);
+                task = new Task(split[2], split[4], taskStatus, duration, startTime, taskID);
                 break;
             case TaskType.EPIC:
-                task = new Epic(split[2], split[4], taskStatus,duration, startTime, taskID);
+                task = new Epic(split[2], split[4], taskStatus, duration, startTime, taskID);
                 break;
             default:
                 UUID epicID = UUID.fromString(split[7]);
@@ -100,11 +101,11 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     public static String toString(Task task) {
         String resultLine = task.getTaskID().toString();
         if (task.getClass() == Task.class) {
-            resultLine = String.join(",",resultLine,TaskType.TASK.toString());
+            resultLine = String.join(",", resultLine, TaskType.TASK.toString());
         } else if (task.getClass() == Epic.class) {
-            resultLine = String.join(",",resultLine,TaskType.EPIC.toString());
+            resultLine = String.join(",", resultLine, TaskType.EPIC.toString());
         } else {
-            resultLine = String.join(",",resultLine,TaskType.SUBTASK.toString());
+            resultLine = String.join(",", resultLine, TaskType.SUBTASK.toString());
         }
         String startTime = Optional.ofNullable(task.getStartTime())
                 .map(localDateTime -> localDateTime.format(DATE_TIME_FORMATTER))
@@ -121,9 +122,9 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                 duration);
         if (task.getClass() == SubTask.class) {
             SubTask subTask = (SubTask) task;
-            resultLine = String.join(",",resultLine, subTask.getEpicID().toString());
+            resultLine = String.join(",", resultLine, subTask.getEpicID().toString());
         } else {
-            resultLine = String.join(",",resultLine, " ");
+            resultLine = String.join(",", resultLine, " ");
         }
 
         return resultLine;
@@ -152,14 +153,14 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     }
 
     @Override
-    public Task addNewTask(Task task)  {
+    public Task addNewTask(Task task) {
         Task newTask = super.addNewTask(task);
         save();
         return newTask;
     }
 
     @Override
-    public Task updateTask(Task task)  {
+    public Task updateTask(Task task) {
         Task newTask = super.updateTask(task);
         save();
         return newTask;

@@ -10,7 +10,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 import java.util.UUID;
 
-public class BaseHandler  {
+public abstract class BaseHandler {
     TaskManager taskManager;
     Gson gson;
 

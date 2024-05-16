@@ -15,6 +15,4 @@ public enum Endpoint {
     POST_EPIC,
     DELETE_EPIC,
     UNKNOWN
-
-
 }

@@ -1,4 +1,4 @@
-package taskserver.TypeAdapter;
+package taskserver.typeadapter;
 
 import com.google.gson.TypeAdapter;
 import com.google.gson.stream.JsonReader;

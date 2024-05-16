@@ -12,7 +12,6 @@ public class HistoryHandler extends BaseHandler implements HttpHandler {
         super(taskManager);
     }
 
-
     @Override
     public void handle(HttpExchange exchange) throws IOException {
         if (exchange.getRequestMethod().equals("GET")) {
@@ -22,7 +21,6 @@ public class HistoryHandler extends BaseHandler implements HttpHandler {
             sendCode(exchange,404);
         }
     }
-
 }
 
 

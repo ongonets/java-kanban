@@ -53,7 +53,6 @@ public class SubTaskHandler extends BaseHandler implements HttpHandler {
         return Endpoint.UNKNOWN;
     }
 
-
     private void handleGetTasksList(HttpExchange httpExchange) throws IOException {
         String response = gson.toJson(taskManager.subTaskList());
         sendText(httpExchange, response, 200);
@@ -107,8 +106,5 @@ public class SubTaskHandler extends BaseHandler implements HttpHandler {
             }
             sendCode(httpExchange, 201);
         }
-
-
     }
-
 }

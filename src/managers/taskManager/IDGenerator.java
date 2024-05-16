@@ -5,8 +5,6 @@ import java.util.UUID;
 
 public class IDGenerator {
 
-
-
     static UUID generateNewID(Set<UUID> list) {
         UUID newUUID = UUID.randomUUID();
         while (list.contains(newUUID))

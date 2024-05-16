@@ -21,7 +21,6 @@ public class PriorityHandler extends BaseHandler implements HttpHandler {
             sendCode(exchange,404);
         }
     }
-
 }
 
 

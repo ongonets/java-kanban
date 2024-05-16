@@ -60,7 +60,6 @@ public class EpicHandler extends BaseHandler implements HttpHandler {
         return Endpoint.UNKNOWN;
     }
 
-
     private void handleGetTasksList(HttpExchange httpExchange) throws IOException {
         String response = gson.toJson(taskManager.epicList());
         sendText(httpExchange, response, 200);
@@ -115,11 +114,7 @@ public class EpicHandler extends BaseHandler implements HttpHandler {
             }
             sendCode(httpExchange, 201);
         }
-
-
     }
-
-
 
     private void handleGetSubTasksList(HttpExchange httpExchange) throws IOException {
         Optional<UUID> taskIDOpt = getTaskId(httpExchange);

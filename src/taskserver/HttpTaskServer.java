@@ -5,8 +5,8 @@ import com.google.gson.GsonBuilder;
 import com.sun.net.httpserver.HttpServer;
 import managers.Managers;
 import managers.taskManager.TaskManager;
-import taskserver.TypeAdapter.DurationAdapter;
-import taskserver.TypeAdapter.LocalDateTimeAdapter;
+import taskserver.typeadapter.DurationAdapter;
+import taskserver.typeadapter.LocalDateTimeAdapter;
 import taskserver.handler.*;
 
 import java.io.IOException;
@@ -36,8 +36,8 @@ public class HttpTaskServer {
         httpServer.stop(0);
     }
 
-    public static  Gson getGson() {
-        return   new GsonBuilder()
+    public static Gson getGson() {
+        return new GsonBuilder()
                 .registerTypeAdapter(Duration.class, new DurationAdapter())
                 .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter())
                 .create();

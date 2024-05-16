@@ -9,7 +9,6 @@ import java.util.UUID;
 public class Epic extends Task {
 
     private ArrayList<UUID> subTaskID;
-
     private LocalDateTime endTime;
 
     public Epic(String name, String description, TaskStatus status) {
@@ -24,12 +23,13 @@ public class Epic extends Task {
 
     public Epic(String name, String description, TaskStatus status, Duration duration, LocalDateTime startTime) {
         super(name, description, status, duration, startTime);
-        subTaskID =  new ArrayList<>();
+        subTaskID = new ArrayList<>();
     }
 
-    public Epic(String name, String description, TaskStatus status, Duration duration, LocalDateTime startTime, UUID taskID) {
+    public Epic(String name, String description, TaskStatus status,
+                Duration duration, LocalDateTime startTime, UUID taskID) {
         super(name, description, status, duration, startTime, taskID);
-        subTaskID =  new ArrayList<>();
+        subTaskID = new ArrayList<>();
     }
 
     @Override
@@ -64,7 +64,6 @@ public class Epic extends Task {
     }
 
     public void setSubTaskID(ArrayList<UUID> subTaskID) {
-
         this.subTaskID = new ArrayList<>(subTaskID);
     }
 

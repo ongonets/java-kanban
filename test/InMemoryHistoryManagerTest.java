@@ -60,7 +60,6 @@ public class InMemoryHistoryManagerTest {
         historyManager.add(task);
         historyManager.add(task);
         List<Task> list = historyManager.getHistory();
-        System.out.println(list.size());
        Assertions.assertEquals(1, list.size());
     }
 }

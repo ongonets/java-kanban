@@ -40,7 +40,6 @@ public class InMemoryHistoryManager implements HistoryManager {
 
         }
 
-
         public int size() {
             return this.size;
         }
@@ -70,10 +69,7 @@ public class InMemoryHistoryManager implements HistoryManager {
             }
             size--;
         }
-
-
     }
-
 
     @Override
     public List<Task> getHistory() {
@@ -96,6 +92,5 @@ public class InMemoryHistoryManager implements HistoryManager {
             history.removeNode(removeNode);
             historyByID.remove(taskID);
         }
-
     }
 }

@@ -28,9 +28,10 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public Task addNewTask(Task task) throws TaskValidateException {
+    public Task addNewTask(Task task) {
         try {
-            validateTime(task);task.setTaskID(IDGenerator.generateNewID(tasks.keySet()));
+            validateTime(task);
+            task.setTaskID(IDGenerator.generateNewID(tasks.keySet()));
             tasks.put(task.getTaskID(), task);
             addToPriority(task);
         } catch (RuntimeException e) {
@@ -41,7 +42,7 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public Task updateTask(Task task) throws TaskValidateException {
+    public Task updateTask(Task task) {
         try {
             validateTime(task);
         } catch (RuntimeException e) {
@@ -123,7 +124,7 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     protected void updateEpicStatus(UUID epicID) {
-        Epic epic =  epics.get(epicID);
+        Epic epic = epics.get(epicID);
         Supplier<Stream<Task>> subTaskStream = () -> epic.getSubTaskID().stream()
                 .map(taskID -> subTasks.get(taskID));
 
@@ -177,7 +178,7 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public SubTask addNewSubTask(SubTask subTask) throws TaskValidateException {
+    public SubTask addNewSubTask(SubTask subTask) {
         try {
             validateTime(subTask);
         } catch (RuntimeException e) {
@@ -185,7 +186,7 @@ public class InMemoryTaskManager implements TaskManager {
         }
         subTask.setTaskID(IDGenerator.generateNewID(subTasks.keySet()));
         subTasks.put(subTask.getTaskID(), subTask);
-        Epic epic =  epics.get(subTask.getEpicID());
+        Epic epic = epics.get(subTask.getEpicID());
         epic.addSubTask(subTask.getTaskID());
         updateEpic(epic);
         addToPriority(subTask);
@@ -193,7 +194,7 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public SubTask updateSubTask(SubTask subTask) throws TaskValidateException {
+    public SubTask updateSubTask(SubTask subTask) {
         try {
             validateTime(subTask);
         } catch (RuntimeException e) {
@@ -208,8 +209,8 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void deleteSubTask(UUID subTaskID) {
-        SubTask subTask =  subTasks.get(subTaskID);
-        Epic epic =  epics.get(subTask.getEpicID());
+        SubTask subTask = subTasks.get(subTaskID);
+        Epic epic = epics.get(subTask.getEpicID());
         epic.removeSubTask(subTaskID);
         deleteSubTaskInPriority(subTaskID);
         subTasks.remove(subTaskID);
@@ -267,7 +268,7 @@ public class InMemoryTaskManager implements TaskManager {
         }
     }
 
-       @Override
+    @Override
     public void validateTime(Task validateTask) {
         if (validateTask.getStartTime() != null) {
             LocalDateTime startTime = validateTask.getStartTime();
