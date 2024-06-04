@@ -31,12 +31,13 @@ public class InMemoryTaskManager implements TaskManager {
     public Task addNewTask(Task task) {
         try {
             validateTime(task);
+            task.setTaskID(IDGenerator.generateNewID(tasks.keySet()));
+            tasks.put(task.getTaskID(), task);
+            addToPriority(task);
         } catch (RuntimeException e) {
             throw new TaskValidateException("Время задачи пересекается по времени выполнения");
         }
-        task.setTaskID(IDGenerator.generateNewID(tasks.keySet()));
-        tasks.put(task.getTaskID(), task);
-        addToPriority(task);
+
         return task;
     }
 
@@ -60,10 +61,10 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public Task getTask(UUID taskID) {
-        Task task = tasks.get(taskID);
-        historyManager.add(task);
-        return task;
+    public Optional<Task> getTask(UUID taskID) {
+        Optional<Task> taskOpt = Optional.ofNullable(tasks.get(taskID));
+        taskOpt.ifPresent(task -> historyManager.add(task));
+        return taskOpt;
     }
 
     @Override
@@ -123,7 +124,7 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     protected void updateEpicStatus(UUID epicID) {
-        Epic epic =  epics.get(epicID);
+        Epic epic = epics.get(epicID);
         Supplier<Stream<Task>> subTaskStream = () -> epic.getSubTaskID().stream()
                 .map(taskID -> subTasks.get(taskID));
 
@@ -160,16 +161,20 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public ArrayList<UUID> subTaskListByEpic(UUID epicID) {
-        Epic epic = epics.get(epicID);
-        return epic.getSubTaskID();
+    public List<UUID> subTaskListByEpic(UUID epicID) {
+        List<UUID> subTaskList = new ArrayList<>();
+        Optional<Epic> epicOpt = Optional.ofNullable(epics.get(epicID));
+        if (epicOpt.isPresent()) {
+            subTaskList = epicOpt.get().getSubTaskID();
+        }
+        return subTaskList;
     }
 
     @Override
-    public Task getEpic(UUID taskID) {
-        Task task = epics.get(taskID);
-        historyManager.add(task);
-        return task;
+    public Optional<Task> getEpic(UUID taskID) {
+        Optional<Task> taskOpt = Optional.ofNullable(epics.get(taskID));
+        taskOpt.ifPresent(task -> historyManager.add(task));
+        return taskOpt;
     }
 
     @Override
@@ -181,7 +186,7 @@ public class InMemoryTaskManager implements TaskManager {
         }
         subTask.setTaskID(IDGenerator.generateNewID(subTasks.keySet()));
         subTasks.put(subTask.getTaskID(), subTask);
-        Epic epic =  epics.get(subTask.getEpicID());
+        Epic epic = epics.get(subTask.getEpicID());
         epic.addSubTask(subTask.getTaskID());
         updateEpic(epic);
         addToPriority(subTask);
@@ -204,8 +209,8 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void deleteSubTask(UUID subTaskID) {
-        SubTask subTask =  subTasks.get(subTaskID);
-        Epic epic =  epics.get(subTask.getEpicID());
+        SubTask subTask = subTasks.get(subTaskID);
+        Epic epic = epics.get(subTask.getEpicID());
         epic.removeSubTask(subTaskID);
         deleteSubTaskInPriority(subTaskID);
         subTasks.remove(subTaskID);
@@ -227,10 +232,10 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public Task getSubTask(UUID taskID) {
-        Task task = subTasks.get(taskID);
-        historyManager.add(task);
-        return task;
+    public Optional<Task> getSubTask(UUID taskID) {
+        Optional<Task> taskOpt = Optional.ofNullable(subTasks.get(taskID));
+        taskOpt.ifPresent(task -> historyManager.add(task));
+        return taskOpt;
     }
 
     @Override
@@ -263,7 +268,7 @@ public class InMemoryTaskManager implements TaskManager {
         }
     }
 
-       @Override
+    @Override
     public void validateTime(Task validateTask) {
         if (validateTask.getStartTime() != null) {
             LocalDateTime startTime = validateTask.getStartTime();

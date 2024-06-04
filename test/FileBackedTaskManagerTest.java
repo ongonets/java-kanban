@@ -51,7 +51,6 @@ public class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTaskMan
         Task actual;
         try{
             List<String> lines = Files.readAllLines(taskManager.getFile().toPath());
-            System.out.println(lines.get(1));
             actual = FileBackedTaskManager.fromString(lines.get(1));
         } catch (IOException e) {
             throw new RuntimeException(e);
